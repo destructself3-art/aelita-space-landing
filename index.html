@@ -1,0 +1,1786 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Межпланетные линии «Аэлита»</title>
+<meta name="description" content="Аэлита — туристические рейсы на Марс, Луну и орбиту. Концепт-лендинг.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23F2E6D0' stroke='%231B1A2E' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='14' fill='%23D2502D'/%3E%3Cellipse cx='32' cy='32' rx='27' ry='8' fill='none' stroke='%231B1A2E' stroke-width='3' transform='rotate(-24 32 32)'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,600&family=Unbounded:wght@500;700;800;900&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --cream:#F2E6D0; --paper:#F8F0E1; --paper-2:#EFE3CC;
+  --terra:#D2502D; --terra-deep:#A93B1F; --terra-glow:#F4845C;
+  --teal:#1F5E63; --teal-pale:#9CC6BD;
+  --night:#1B1A2E; --night-2:#25233D; --mustard:#E9A23B;
+  --ink:#1B1A2E;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-serif:"Playfair Display",Georgia,"Times New Roman",serif;
+  --f-sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+  --sky-t:#EFAE86; --sky-m:#F4CFA4; --sky-b:#F6E4C8;
+  --gutter:clamp(16px,5.2vw,92px);
+  --ease:cubic-bezier(.2,.7,.1,1);
+}
+[data-tone="light"]{--fg:var(--ink);--fg-soft:rgba(27,26,46,.76);--accent:var(--terra-deep);--line:rgba(27,26,46,.3);--plate:rgba(248,240,225,.9)}
+[data-tone="dark"]{--fg:var(--cream);--fg-soft:rgba(242,230,208,.8);--accent:var(--terra-glow);--line:rgba(242,230,208,.32);--plate:rgba(27,26,46,.86)}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--night);color:var(--ink);font:400 17px/1.6 var(--f-sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--terra);color:var(--cream)}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--mustard);outline-offset:3px;border-radius:4px}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- Fixed stage ---------- */
+#sky{position:fixed;inset:0;z-index:0;background:linear-gradient(to top,var(--sky-b) 0%,var(--sky-m) 42%,var(--sky-t) 100%)}
+#scene{position:fixed;inset:0;z-index:1;width:100%;height:100%;display:block;pointer-events:none}
+.grain{position:fixed;inset:-40px;z-index:2;pointer-events:none;opacity:.34;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .1 0 0 0 0 .15 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 1.2s steps(5) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-14px,9px)}40%{transform:translate(11px,-12px)}60%{transform:translate(-8px,-6px)}80%{transform:translate(13px,10px)}100%{transform:translate(0,0)}}
+.vignette{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(120% 90% at 50% 45%,transparent 60%,rgba(27,26,46,.22) 100%)}
+.fallback-rocket{position:fixed;z-index:1;right:12vw;bottom:8vh;height:62vh;display:none}
+.no-webgl .fallback-rocket{display:block}
+
+/* ---------- Header ---------- */
+.top{position:fixed;left:0;right:0;top:0;z-index:20;padding:calc(env(safe-area-inset-top,0px) + 18px) var(--gutter) 14px;display:flex;align-items:center;gap:24px;color:var(--fg);transition:color .5s}
+.top::before{content:"";position:absolute;inset:0 0 -34px;z-index:-1;pointer-events:none;background:linear-gradient(to bottom,var(--sky-t) 0%,var(--sky-t) 52%,transparent 100%)}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;margin-right:auto}
+.brand svg{width:42px;height:42px;flex:none}
+.brand b{display:block;font:800 17px/1 var(--f-display);letter-spacing:.16em}
+.brand i{display:block;font:italic 500 13px/1.2 var(--f-serif);opacity:.8;margin-top:3px}
+.nav{display:flex;gap:26px;font:500 12px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase}
+.nav a{text-decoration:none;padding:8px 0;border-bottom:1.5px solid transparent;transition:border-color .25s}
+.nav a:hover{border-color:currentColor}
+.lang{display:flex;border:1.5px solid currentColor;border-radius:99px;padding:2px;font:600 11px/1 var(--f-mono);letter-spacing:.1em}
+.lang button{background:none;border:0;padding:0 10px;min-height:38px;border-radius:99px;cursor:pointer;min-width:42px}
+.lang button[aria-pressed="true"]{background:var(--fg);color:var(--night)}
+[data-tone="dark"] .lang button[aria-pressed="true"]{color:var(--night)}
+[data-tone="light"] .lang button[aria-pressed="true"]{color:var(--cream)}
+.btn{--b:var(--terra);display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 24px;border-radius:99px;border:2px solid var(--ink);background:var(--b);color:var(--cream);font:700 13px/1 var(--f-display);letter-spacing:.06em;text-transform:uppercase;text-decoration:none;cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .2s var(--ease),box-shadow .2s var(--ease),background .2s}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink);background:#DD5A34}
+.btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.btn.small{min-height:40px;padding:0 18px;font-size:11px;box-shadow:3px 3px 0 var(--ink)}
+.btn.ghost{background:transparent;color:var(--fg);border-color:currentColor;box-shadow:none}
+.btn.ghost:hover{background:var(--fg);color:var(--night);box-shadow:none}
+[data-tone="light"] .btn.ghost:hover{color:var(--cream)}
+
+/* ---------- Altimeter ---------- */
+.alti{position:fixed;z-index:15;right:calc(var(--gutter) * .45);top:50%;transform:translateY(-50%);height:min(58vh,520px);width:118px;color:var(--fg);transition:color .5s;font-family:var(--f-mono)}
+.alti{transition:color .5s,opacity .4s}
+.alti.away{opacity:0;pointer-events:none}
+.alti.away button{visibility:hidden}
+.alti-read{position:absolute;right:0;top:-66px;text-align:right;white-space:nowrap}
+.alti-read small{display:block;font-size:10px;letter-spacing:.16em;opacity:.7}
+.alti-read strong{font:600 15px/1.3 var(--f-mono);font-variant-numeric:tabular-nums}
+.alti-scale{position:absolute;right:6px;top:0;bottom:0;width:2px;background:var(--line)}
+.alti-fill{position:absolute;left:0;top:0;width:2px;background:var(--fg);height:0}
+.alti ol{list-style:none;margin:0;padding:0;position:absolute;inset:0}
+.alti li{position:absolute;right:0;transform:translateY(-50%)}
+.alti li button{display:flex;align-items:center;gap:10px;background:none;border:0;padding:6px 0;cursor:pointer;font:500 10px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:inherit;opacity:.55;transition:opacity .3s}
+.alti li button::after{content:"";width:14px;height:2px;background:currentColor}
+.alti li button:hover,.alti li button[aria-current="step"]{opacity:1}
+.alti li button[aria-current="step"]::after{width:22px;background:var(--accent)}
+.alti-mark{position:absolute;right:0;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--fg);transform:translateY(-50%);top:0}
+
+/* ---------- Chapters ---------- */
+main{position:relative;z-index:5}
+.chapter{position:relative;min-height:var(--h,200vh)}
+.panel{position:sticky;top:clamp(96px,15vh,150px);width:min(560px,44vw);margin-left:var(--gutter);color:var(--fg);transition:color .5s,text-shadow .5s}
+.panel[data-tone="dark"]{text-shadow:0 1px 14px rgba(27,26,46,.55)}
+.panel[data-tone="light"]{text-shadow:0 1px 16px rgba(248,240,225,.35)}
+.label{display:flex;align-items:center;gap:12px;margin:0 0 22px;font:500 12px/1.2 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-soft)}
+.label::before{content:"";width:28px;height:2px;background:var(--accent)}
+h1,h2,h3{margin:0;font-family:var(--f-display);text-wrap:balance}
+h2{font-weight:700;font-size:clamp(30px,3.5vw,56px);line-height:1.04;letter-spacing:-.01em;text-transform:uppercase}
+h1 em,h2 em{display:block;font:italic 500 1.12em/1 var(--f-serif);text-transform:none;letter-spacing:0;color:var(--accent);margin-top:.12em}
+.panel p{margin:22px 0 0;max-width:34em;color:var(--fg-soft)}
+.panel p.lead{font-size:clamp(17px,1.3vw,20px);color:var(--fg)}
+
+/* Hero */
+.hero{--h:112vh}
+.hero .panel{position:relative;top:auto;padding-top:clamp(120px,22vh,220px)}
+.hero h1{font-weight:800;font-size:clamp(40px,6.2vw,108px);line-height:.96;letter-spacing:-.015em;text-transform:uppercase}
+.hero h1 em{font-size:1.02em}
+.hero .lead{max-width:30em}
+.countdown{margin-top:34px;display:flex;flex-direction:column;gap:10px}
+.countdown span{font:500 11px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-soft)}
+.cd-digits{display:flex;gap:8px;font-family:var(--f-mono)}
+.cd-digits div{min-width:66px;padding:10px 10px 8px;border:1.5px solid var(--fg);border-radius:6px;text-align:center;background:rgba(248,240,225,.35)}
+.cd-digits b{display:block;font:600 26px/1 var(--f-mono);font-variant-numeric:tabular-nums}
+.cd-digits small{display:block;margin-top:5px;font-size:10px;letter-spacing:.14em;opacity:.7;text-transform:uppercase}
+.hero-cta{display:flex;flex-wrap:wrap;gap:14px 18px;margin-top:34px}
+.scroll-hint{position:absolute;left:var(--gutter);bottom:6vh;display:flex;align-items:center;gap:12px;font:500 11px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--fg);opacity:.8}
+.scroll-hint i{width:2px;height:38px;background:currentColor;transform-origin:top;animation:hint 1.8s var(--ease) infinite}
+@keyframes hint{0%{transform:scaleY(0)}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* Facts row */
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:34px;padding-top:22px;border-top:1.5px solid var(--line)}
+.facts b{display:block;font:700 clamp(22px,2vw,30px)/1.1 var(--f-display);color:var(--fg)}
+.facts span{display:block;margin-top:8px;font-size:13.5px;line-height:1.45;color:var(--fg-soft)}
+
+/* Why */
+.reasons{list-style:none;margin:30px 0 0;padding:0;display:grid;gap:26px}
+.reasons li{display:grid;grid-template-columns:minmax(120px,auto) 1fr;gap:22px;align-items:start;padding-top:22px;border-top:1.5px solid var(--line)}
+.reasons b{font:800 clamp(38px,3.6vw,60px)/.95 var(--f-display);letter-spacing:-.02em;color:var(--fg)}
+.reasons b small{font-size:.42em;letter-spacing:0;margin-left:4px}
+.reasons h3{font:700 15px/1.3 var(--f-display);text-transform:uppercase;letter-spacing:.03em}
+.reasons p{margin:8px 0 0;font-size:15.5px}
+
+/* Route timeline */
+.route{--h:250vh}
+.timeline{list-style:none;margin:30px 0 0;padding:0 0 0 26px;position:relative}
+.timeline::before{content:"";position:absolute;left:5px;top:8px;bottom:8px;width:2px;background:repeating-linear-gradient(to bottom,var(--line) 0 6px,transparent 6px 11px)}
+.timeline li{position:relative;padding:0 0 18px}
+.timeline li::before{content:"";position:absolute;left:-26px;top:5px;width:12px;height:12px;border-radius:50%;border:2px solid var(--fg);background:var(--night)}
+.timeline li.on::before{background:var(--accent);border-color:var(--accent)}
+.timeline b{font:600 12px/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.timeline p{margin:6px 0 0;font-size:15.5px;line-height:1.5}
+
+/* Cabins */
+.cabins{list-style:none;margin:30px 0 0;padding:0;display:grid;gap:14px}
+.cabin{display:grid;grid-template-columns:86px 1fr auto;gap:18px;align-items:center;padding:18px 0;border-top:1.5px solid var(--line)}
+.cabin svg{width:86px;height:86px}
+.cabin h3{font:700 16px/1.2 var(--f-display);text-transform:uppercase;letter-spacing:.02em}
+.cabin p{margin:6px 0 0;font-size:14.5px;line-height:1.45}
+.cabin .price{text-align:right;font:600 13px/1.3 var(--f-mono);white-space:nowrap}
+.cabin .price small{display:block;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-soft)}
+.cabin .price strong{font:700 17px/1.2 var(--f-display);color:var(--fg)}
+
+/* Mars */
+.sights{list-style:none;margin:30px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:26px 28px}
+.sights li{padding-top:18px;border-top:1.5px solid var(--line)}
+.sights b{display:block;font:600 12px/1.2 var(--f-mono);letter-spacing:.12em;color:var(--accent)}
+.sights h3{margin-top:8px;font:700 17px/1.2 var(--f-display);text-transform:uppercase}
+.sights p{margin:8px 0 0;font-size:14.5px;line-height:1.5}
+
+/* ---------- Booking ---------- */
+.booking{position:relative;padding:clamp(120px,16vh,170px) var(--gutter) 130px;color:var(--cream)}
+.booking .label{color:rgba(242,230,208,.8)}
+.booking .label::before{background:var(--terra-glow)}
+.booking h2{max-width:13em}
+.booking h2 em{color:var(--terra-glow)}
+.booking-grid{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,1fr);gap:clamp(28px,4.4vw,72px);margin-top:48px;align-items:start}
+.form{background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:6px;padding:clamp(20px,2.6vw,34px);box-shadow:8px 8px 0 rgba(8,7,18,.55);position:relative}
+.form-head{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-bottom:16px;margin-bottom:24px;border-bottom:2px solid var(--ink);font:600 11px/1.3 var(--f-mono);letter-spacing:.14em;text-transform:uppercase}
+.form-head span:last-child{color:var(--terra-deep)}
+fieldset{border:0;padding:0;margin:0 0 26px;min-width:0}
+legend{padding:0;margin-bottom:12px;font:600 11px/1.2 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:rgba(27,26,46,.72)}
+.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.opt{position:relative}
+.opt input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.opt label{display:block;height:100%;border:1.5px solid var(--ink);border-radius:10px;padding:14px 14px 13px;cursor:pointer;transition:background .2s,color .2s,transform .2s var(--ease)}
+.opt label:hover{transform:translateY(-2px);background:var(--paper-2)}
+.opt input:checked+label{background:var(--ink);color:var(--cream)}
+.opt input:focus-visible+label{outline:2px solid var(--terra);outline-offset:3px}
+.pills .opt label{border-radius:99px;padding:12px 16px;min-height:44px;display:flex;align-items:center;gap:8px;font:500 13px/1.1 var(--f-mono)}
+.pills .opt label em{font-style:normal;font-size:10.5px;letter-spacing:.06em;color:var(--terra-deep)}
+.pills .opt input:checked+label em{color:var(--terra-glow)}
+.dest-glyph{display:block;width:30px;height:30px;margin-bottom:12px;border-radius:50%;border:1.5px solid currentColor;position:relative}
+.dest-glyph.orbit{background:radial-gradient(circle at 38% 38%,#2E7A7C 0 42%,var(--teal) 43%)}
+.dest-glyph.orbit::after{content:"";position:absolute;inset:-5px -9px;border:1.5px solid currentColor;border-radius:50%;transform:rotate(-22deg)}
+.dest-glyph.moon{background:radial-gradient(circle at 64% 34%,#CFC3A8 0 18%,transparent 19%),radial-gradient(circle at 34% 64%,#CFC3A8 0 12%,transparent 13%),#E9DFC9}
+.dest-glyph.mars{background:radial-gradient(circle at 50% 8%,var(--cream) 0 16%,transparent 17%),radial-gradient(circle at 30% 60%,var(--terra-deep) 0 20%,transparent 21%),var(--terra)}
+.opt b{display:block;font:700 13px/1.15 var(--f-display);text-transform:uppercase;letter-spacing:.02em}
+.opt small{display:block;margin-top:6px;font:400 11.5px/1.35 var(--f-mono);opacity:.78}
+.row2{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:end}
+.stepper{display:flex;align-items:center;border:1.5px solid var(--ink);border-radius:99px;height:48px}
+.stepper button{width:46px;height:44px;border:0;background:none;font:600 20px/1 var(--f-mono);cursor:pointer;border-radius:99px}
+.stepper button:hover{background:var(--paper-2)}
+.stepper button:disabled{opacity:.3;cursor:not-allowed}
+.stepper output{min-width:34px;text-align:center;font:600 17px/1 var(--f-mono);font-variant-numeric:tabular-nums}
+.field input{width:100%;height:48px;border:0;border-bottom:2px solid var(--ink);background:transparent;padding:0 2px;font:500 16px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.06em;border-radius:0}
+.field input:focus{outline:none;border-bottom-color:var(--terra)}
+.field input::placeholder{color:rgba(27,26,46,.4)}
+.total{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;padding-top:20px;margin-top:4px;border-top:2px dashed rgba(27,26,46,.4)}
+.total span{font:500 11px/1.4 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:rgba(27,26,46,.72)}
+.total strong{display:block;font:800 clamp(24px,2.4vw,34px)/1.1 var(--f-display);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.form .btn{width:100%;margin-top:22px;min-height:56px;font-size:14px}
+.form .note{margin:14px 0 0;font:400 12px/1.5 var(--f-mono);color:rgba(27,26,46,.66)}
+
+/* Ticket */
+.ticket-col{position:sticky;top:110px}
+.slot{position:relative;z-index:3;height:16px;margin:0 -12px;border-radius:10px;background:#0C0B17;border:2px solid #05040B;box-shadow:inset 0 4px 6px rgba(0,0,0,.7),0 1px 0 rgba(242,230,208,.18)}
+.slot::after{content:"";position:absolute;left:14px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:#3a3a3a;transition:background .3s,box-shadow .3s}
+.printing .slot::after,.printed .slot::after{background:#8BE08B;box-shadow:0 0 8px #8BE08B}
+.ticket-clip{overflow:hidden;margin-top:-8px;padding:0 14px 18px 0}
+.ticket{--stub:150px;display:grid;grid-template-columns:minmax(0,1fr) var(--stub);color:var(--ink);filter:drop-shadow(7px 9px 0 rgba(8,7,18,.5));transition:transform .5s var(--ease)}
+.t-main,.t-stub{background:var(--paper);position:relative}
+.t-main{border-radius:12px 0 0 12px;-webkit-mask:radial-gradient(circle 12px at 100% 0,#0000 97%,#000) top/100% 51% no-repeat,radial-gradient(circle 12px at 100% 100%,#0000 97%,#000) bottom/100% 51% no-repeat;mask:radial-gradient(circle 12px at 100% 0,#0000 97%,#000) top/100% 51% no-repeat,radial-gradient(circle 12px at 100% 100%,#0000 97%,#000) bottom/100% 51% no-repeat}
+.t-stub{border-radius:0 12px 12px 0;border-left:2px dashed rgba(27,26,46,.35);-webkit-mask:radial-gradient(circle 12px at 0 0,#0000 97%,#000) top/100% 51% no-repeat,radial-gradient(circle 12px at 0 100%,#0000 97%,#000) bottom/100% 51% no-repeat;mask:radial-gradient(circle 12px at 0 0,#0000 97%,#000) top/100% 51% no-repeat,radial-gradient(circle 12px at 0 100%,#0000 97%,#000) bottom/100% 51% no-repeat;transition:transform .7s var(--ease)}
+.t-band{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 20px 12px 18px;background:var(--terra);color:var(--cream);border-radius:12px 0 0 0;font:600 10px/1.2 var(--f-mono);letter-spacing:.16em;text-transform:uppercase}
+.t-band b{display:flex;align-items:center;gap:8px;font:800 14px/1 var(--f-display);letter-spacing:.16em}
+.t-band svg{width:24px;height:24px}
+.t-stub .t-band{border-radius:0 12px 0 0;justify-content:center}
+.t-route{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:20px 20px 10px 18px}
+.t-code{font:800 clamp(30px,3vw,44px)/1 var(--f-display);letter-spacing:.02em}
+.t-city{display:block;margin-top:6px;font:500 10px/1.3 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:rgba(27,26,46,.7)}
+.t-arc{position:relative;height:40px}
+.t-arc svg{width:100%;height:100%;overflow:visible}
+.t-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:14px 16px;padding:14px 20px 18px 18px}
+.t-f small{display:block;font:500 9.5px/1.2 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:rgba(27,26,46,.62)}
+.t-f .flap{display:block;margin-top:5px;font:600 14px/1.2 var(--f-mono);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-f.wide{grid-column:span 2}
+.t-total{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 20px 0 18px;padding:12px 0 18px;border-top:1.5px solid rgba(27,26,46,.22)}
+.t-total small{font:500 9.5px/1.2 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:rgba(27,26,46,.62)}
+.t-total .flap{font:800 17px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.t-stub-body{padding:16px 14px;display:grid;gap:12px}
+.barcode{display:block;width:100%;height:58px;margin-top:4px}
+.t-code-small{font:600 11px/1 var(--f-mono);letter-spacing:.18em;text-align:center}
+.stamp{position:absolute;left:calc(50% - 56px);top:46px;width:112px;height:112px;border:3px solid var(--terra);border-radius:50%;display:grid;place-items:center;text-align:center;color:var(--terra);font:800 12px/1.15 var(--f-display);letter-spacing:.08em;text-transform:uppercase;transform:rotate(-14deg) scale(2.4);opacity:0;pointer-events:none;mix-blend-mode:multiply}
+.stamp::before{content:"";position:absolute;inset:6px;border:1.5px solid currentColor;border-radius:50%}
+.printed .stamp{animation:stamp .45s cubic-bezier(.3,1.6,.5,1) forwards}
+@keyframes stamp{0%{opacity:0;transform:rotate(-14deg) scale(2.4)}100%{opacity:.88;transform:rotate(-14deg) scale(1)}}
+.printed .t-stub{transform:translate(16px,10px) rotate(5deg)}
+.printing .ticket{animation:print 1.7s steps(16) forwards}
+@keyframes print{0%{transform:translateY(-102%)}100%{transform:translateY(0)}}
+.retract .ticket{transform:translateY(-102%);transition:transform .35s ease-in}
+.flap .ch{display:inline-block;min-width:.01em}
+.confirm{margin-top:20px;padding:18px 20px;border:1.5px solid rgba(242,230,208,.4);border-radius:6px;background:rgba(27,26,46,.94);font:400 14.5px/1.55 var(--f-sans);color:var(--cream)}
+.confirm b{font-family:var(--f-mono);color:var(--terra-glow)}
+.confirm button{margin-top:12px;background:none;border:0;padding:8px 0;color:var(--cream);font:600 12px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;border-bottom:1.5px solid currentColor;cursor:pointer}
+
+/* ---------- Footer ---------- */
+.footer{position:relative;z-index:5;background:var(--night);color:var(--cream);padding:clamp(70px,10vw,120px) var(--gutter) calc(36px + env(safe-area-inset-bottom,0px));border-top:2px solid rgba(242,230,208,.14);overflow:hidden}
+.footer .word{display:block;font:900 clamp(56px,15.5vw,270px)/.82 var(--f-display);letter-spacing:-.02em;color:var(--terra);margin-left:-.04em}
+.footer .word em{display:block;font:italic 500 .3em/1.2 var(--f-serif);letter-spacing:0;color:var(--cream);margin:.2em 0 0 .12em}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:34px;margin-top:64px;padding-top:30px;border-top:1.5px solid rgba(242,230,208,.2)}
+.foot-grid h3{font:600 11px/1.3 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--terra-glow);margin-bottom:12px}
+.foot-grid p{margin:0;font-size:14.5px;line-height:1.6;color:rgba(242,230,208,.8)}
+.fine{margin-top:48px;font:400 12px/1.6 var(--f-mono);color:rgba(242,230,208,.58);columns:2 320px;column-gap:40px}
+.fine p{margin:0 0 10px;break-inside:avoid}
+.foot-bottom{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:40px;font:500 11px/1.4 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:rgba(242,230,208,.62)}
+.foot-bottom a{text-decoration:none;border-bottom:1.5px solid currentColor;padding-bottom:3px}
+
+/* ---------- Loader ---------- */
+.loader{position:fixed;inset:0;z-index:100;background:var(--cream);color:var(--ink);display:grid;place-items:center;padding:24px;transition:transform 1.05s cubic-bezier(.7,0,.2,1)}
+.loader.done{transform:translateY(-101%)}
+.loader-box{width:min(420px,100%)}
+.loader svg{width:74px;height:74px;display:block;margin-bottom:26px}
+.loader .orbit-dot{transform-origin:37px 37px;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader h2{font:800 20px/1.2 var(--f-display);letter-spacing:.06em}
+.loader h2 em{display:inline;font-size:1.1em;margin:0}
+.checks{list-style:none;margin:22px 0 0;padding:0;font:500 13px/1 var(--f-mono);letter-spacing:.04em}
+.checks li{display:flex;gap:8px;align-items:baseline;padding:9px 0;opacity:.35;transition:opacity .3s}
+.checks li::after{content:"";order:1;flex:1;border-bottom:1.5px dotted rgba(27,26,46,.5)}
+.checks li span:last-child{order:2;min-width:32px;text-align:right;color:var(--terra-deep);font-weight:600}
+.checks li.ok{opacity:1}
+.loader-bar{height:3px;margin-top:22px;background:rgba(27,26,46,.15)}
+.loader-bar i{display:block;height:100%;width:0;background:var(--terra);transition:width .35s}
+
+.alti-chip{display:none}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1180px){.nav{display:none}}
+@media (max-width:900px){
+  .alti{display:none}
+  .alti-chip{display:flex;position:fixed;z-index:15;left:16px;bottom:calc(14px + env(safe-area-inset-bottom,0px));gap:8px;align-items:center;padding:9px 14px;border-radius:99px;background:rgba(27,26,46,.82);color:var(--cream);font:500 11px/1 var(--f-mono);letter-spacing:.1em;font-variant-numeric:tabular-nums;backdrop-filter:blur(6px)}
+  .alti-chip i{width:7px;height:7px;border-radius:50%;background:var(--terra-glow)}
+  .alti-chip{transition:opacity .35s,transform .35s}
+  .alti-chip.away{opacity:0;transform:translateY(12px);pointer-events:none}
+  .top{gap:12px;padding-top:calc(env(safe-area-inset-top,0px) + 12px)}
+  .brand i{display:none}
+  .brand svg{width:36px;height:36px}
+  .brand b{font-size:14px}
+  .top .btn.small{padding:0 14px}
+  .chapter{min-height:0;padding:64vh 0 24vh}
+  .hero{padding:54vh 0 6vh}
+  .panel{position:relative;top:auto;width:auto;margin:0 16px;padding:24px 20px 26px;background:var(--plate);border:1.5px solid var(--line);border-radius:6px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  .hero .panel{padding-top:24px}
+  .scroll-hint{display:none}
+  .facts{grid-template-columns:1fr;gap:14px}
+  .facts div{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:baseline}
+  .facts span{margin:0}
+  .reasons li{grid-template-columns:1fr;gap:10px}
+  .sights{grid-template-columns:1fr}
+  .cabin{grid-template-columns:64px 1fr;gap:14px}
+  .cabin svg{width:64px;height:64px}
+  .cabin .price{grid-column:2;text-align:left}
+  .booking{padding-inline:16px;padding-top:40vh}
+  .booking-grid{grid-template-columns:1fr}
+  .ticket-col{position:relative;top:auto}
+  .cd-digits div{min-width:0;flex:1}
+}
+@media (max-width:560px){
+  .choices{grid-template-columns:1fr}
+  .choices .opt label{display:grid;grid-template-columns:30px 1fr;column-gap:12px;align-items:center}
+  .choices .dest-glyph{margin:0;grid-row:span 3}
+  .row2{grid-template-columns:1fr}
+  .ticket{--stub:0px;grid-template-columns:1fr}
+  .t-main{border-radius:12px 12px 0 0;-webkit-mask:radial-gradient(circle 12px at 0 100%,#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 12px at 100% 100%,#0000 97%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 12px at 0 100%,#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 12px at 100% 100%,#0000 97%,#000) right/51% 100% no-repeat}
+  .t-band{border-radius:12px 12px 0 0}
+  .t-stub{border-left:0;border-top:2px dashed rgba(27,26,46,.35);border-radius:0 0 12px 12px;-webkit-mask:radial-gradient(circle 12px at 0 0,#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 12px at 100% 0,#0000 97%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 12px at 0 0,#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 12px at 100% 0,#0000 97%,#000) right/51% 100% no-repeat}
+  .t-stub .t-band{display:none}
+  .t-stub-body{grid-template-columns:1fr 1.2fr;align-items:center}
+  .printed .t-stub{transform:translate(4px,14px) rotate(-3deg)}
+  .t-grid{grid-template-columns:1fr 1fr}
+  .t-f.wide{grid-column:span 2}
+  .stamp{width:96px;height:96px;right:14px;bottom:70px;font-size:10px}
+  .foot-grid{grid-template-columns:1fr;gap:26px}
+}
+@media (prefers-reduced-motion:reduce){
+  .grain,.scroll-hint i,.loader .orbit-dot{animation:none}
+  .loader{transition:opacity .3s}
+  .loader.done{transform:none;opacity:0;pointer-events:none}
+  .printing .ticket{animation-duration:.01s}
+  .printed .stamp{animation-duration:.01s}
+  *{scroll-behavior:auto!important}
+}
+</style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="emblem" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="29.5" fill="#F2E6D0" stroke="#1B1A2E" stroke-width="3"/>
+      <circle cx="32" cy="33" r="13" fill="#D2502D" stroke="#1B1A2E" stroke-width="2.5"/>
+      <path d="M23 37.5c5 2.2 12 .8 17-4.5" stroke="#A93B1F" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="32" cy="33" rx="26" ry="7.5" fill="none" stroke="#1B1A2E" stroke-width="2.5" transform="rotate(-22 32 33)"/>
+      <path d="M47 8.5l1.7 4.6 4.6 1.7-4.6 1.7L47 21.1l-1.7-4.6-4.6-1.7 4.6-1.7z" fill="#E9A23B" stroke="#1B1A2E" stroke-width="1.4" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="mini-rocket" viewBox="0 0 24 12">
+      <path d="M1 6c3-3 9-4.2 15-3.4 3 .4 5.6 1.6 7 3.4-1.4 1.8-4 3-7 3.4C10 10.2 4 9 1 6z" fill="#F2E6D0" stroke="#1B1A2E" stroke-width="1.2"/>
+      <path d="M17 2.8c2.6.5 4.8 1.6 6 3.2-1.2 1.6-3.4 2.7-6 3.2z" fill="#D2502D" stroke="#1B1A2E" stroke-width="1.2"/>
+      <path d="M4 3.6L1.5 .8M4 8.4L1.5 11.2" stroke="#1B1A2E" stroke-width="1.6" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="loader" id="loader" role="status" aria-live="polite">
+  <div class="loader-box">
+    <svg viewBox="0 0 74 74" aria-hidden="true">
+      <use href="#emblem" x="5" y="5" width="64" height="64"/>
+      <g class="orbit-dot"><circle cx="37" cy="3.5" r="3.5" fill="#D2502D" stroke="#1B1A2E" stroke-width="1.5"/></g>
+    </svg>
+    <h2 data-i18n-html="loader.title">Предстартовая <em>проверка</em></h2>
+    <ul class="checks" id="checks">
+      <li><span data-i18n="loader.c1">Обшивка корпуса</span><span></span></li>
+      <li><span data-i18n="loader.c2">Заправка баков</span><span></span></li>
+      <li><span data-i18n="loader.c3">Прогрев двигателей</span><span></span></li>
+      <li><span data-i18n="loader.c4">Экипаж на борту</span><span></span></li>
+    </ul>
+    <div class="loader-bar"><i id="loaderBar"></i></div>
+  </div>
+</div>
+
+<div id="sky" aria-hidden="true"></div>
+<canvas id="scene" aria-hidden="true"></canvas>
+<svg class="fallback-rocket" viewBox="0 0 120 300" aria-hidden="true">
+  <path d="M60 6C82 34 92 70 92 118v110H28V118C28 70 38 34 60 6z" fill="#F2E6D0" stroke="#1B1A2E" stroke-width="4"/>
+  <path d="M60 6C74 24 83 46 88 72H32C37 46 46 24 60 6z" fill="#D2502D" stroke="#1B1A2E" stroke-width="4"/>
+  <rect x="28" y="170" width="64" height="14" fill="#1F5E63" stroke="#1B1A2E" stroke-width="4"/>
+  <circle cx="60" cy="118" r="15" fill="#1F5E63" stroke="#1B1A2E" stroke-width="5"/>
+  <path d="M28 190L4 250l24-8zM92 190l24 60-24-8z" fill="#D2502D" stroke="#1B1A2E" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M44 228h32l-6 18H50z" fill="#1B1A2E"/>
+  <path d="M50 246q10 50 20 0" fill="#E9A23B" stroke="#1B1A2E" stroke-width="3"/>
+</svg>
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="top" id="top" data-tone="light">
+  <a class="brand" href="#launch" data-jump="0"><svg aria-hidden="true"><use href="#emblem"/></svg><span><b data-i18n="brand">АЭЛИТА</b><i data-i18n="brand.sub">межпланетные линии</i></span></a>
+  <nav class="nav" aria-label="Разделы" data-i18n-aria="nav.aria">
+    <a href="#route" data-i18n="nav.route">Маршрут</a>
+    <a href="#cabins" data-i18n="nav.cabins">Каюты</a>
+    <a href="#mars" data-i18n="nav.mars">Марс</a>
+    <a href="#ticket" data-i18n="nav.ticket">Билет</a>
+  </nav>
+  <div class="lang" role="group" aria-label="Язык / Language">
+    <button type="button" data-lang="ru" aria-pressed="true">RU</button>
+    <button type="button" data-lang="en" aria-pressed="false">EN</button>
+  </div>
+  <a class="btn small" href="#ticket" data-i18n="cta.short">Купить билет</a>
+</header>
+
+<aside class="alti" id="alti" data-tone="light" aria-label="Этапы полёта" data-i18n-aria="alti.aria">
+  <div class="alti-read"><small id="altiLabel">ВЫСОТА</small><strong id="altiValue">0 км</strong><small id="altiClock">T−00:10</small></div>
+  <div class="alti-scale"><div class="alti-fill" id="altiFill"></div></div>
+  <ol id="altiList"></ol>
+  <div class="alti-mark" id="altiMark"></div>
+</aside>
+<div class="alti-chip" aria-hidden="true"><i></i><span id="chipValue">0 км</span></div>
+
+<main>
+  <section class="chapter hero" id="launch">
+    <div class="panel">
+      <p class="label" data-i18n="hero.label">Рейс AE-042 · Земля → Марс</p>
+      <h1 data-i18n-html="hero.title">Увидьте Марс, <em>пока он красный</em></h1>
+      <p class="lead" data-i18n="hero.lead">Регулярные туристические рейсы на Красную планету. Семь месяцев в пути, вид, которого нет ни в одном отеле Земли, и обратный билет в комплекте.</p>
+      <div class="countdown">
+        <span id="cdLabel">До открытия окна «Марс-26»</span>
+        <div class="cd-digits" role="timer">
+          <div><b id="cdD">00</b><small data-i18n="u.d">дней</small></div>
+          <div><b id="cdH">00</b><small data-i18n="u.h">часов</small></div>
+          <div><b id="cdM">00</b><small data-i18n="u.m">минут</small></div>
+          <div><b id="cdS">00</b><small data-i18n="u.s">секунд</small></div>
+        </div>
+      </div>
+      <div class="hero-cta">
+        <a class="btn" href="#ticket" data-i18n="cta.book">Забронировать место</a>
+        <a class="btn ghost" href="#ignition" data-i18n="cta.how">Как проходит полёт</a>
+      </div>
+    </div>
+    <div class="scroll-hint" aria-hidden="true"><i></i><span data-i18n="hero.hint">Листайте вниз, чтобы начать отсчёт</span></div>
+  </section>
+
+  <section class="chapter" id="ignition" style="--h:210vh">
+    <div class="panel">
+      <p class="label" data-i18n="ign.label">Этап 1 · Старт</p>
+      <h2 data-i18n-html="ign.title">Мы стартуем, когда <em>Марс подходит ближе</em></h2>
+      <p class="lead" data-i18n="ign.lead">Земля и Марс сближаются раз в 26 месяцев. В это окно дорога занимает около семи месяцев, а не годы, поэтому наше расписание составляет небесная механика, а не турсезон.</p>
+      <div class="facts">
+        <div><b data-i18n="ign.f1b">26 мес.</b><span data-i18n="ign.f1">между стартовыми окнами</span></div>
+        <div><b data-i18n="ign.f2b">≈ 7 мес.</b><span data-i18n="ign.f2">в пути до Марса</span></div>
+        <div><b>2:40</b><span data-i18n="ign.f3">до отделения первой ступени</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="why" style="--h:220vh">
+    <div class="panel">
+      <p class="label" data-i18n="why.label">Этап 2 · Облака</p>
+      <h2 data-i18n-html="why.title">Почему летают <em>с «Аэлитой»</em></h2>
+      <ul class="reasons">
+        <li><b>1962</b><div><h3 data-i18n="why.r1h">Касса открыта с 1962 года</h3><p data-i18n="why.r1">Первый билет на Марс мы продали 64 года назад. Все проданные с тех пор билеты действительны, и в этом окне летят их владельцы и внуки владельцев.</p></div></li>
+        <li><b>1<small>g</small></b><div><h3 data-i18n="why.r2h">Земная гравитация в пути</h3><p data-i18n="why.r2">Жилое кольцо лайнера вращается и создаёт привычную силу тяжести. Кофе остаётся в чашке, а вы спите в кровати, а не в спальном мешке на стене.</p></div></li>
+        <li><b>0</b><div><h3 data-i18n="why.r3h">Потерянных чемоданов</h3><p data-i18n="why.r3">Багаж летит в той же капсуле, что и вы. Норма 20 кг на пассажира, скафандр в неё не входит.</p></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="chapter route" id="route">
+    <div class="panel">
+      <p class="label" data-i18n="route.label">Этап 3 · Орбита</p>
+      <h2 data-i18n-html="route.title">216 дней <em>от порога до кратера</em></h2>
+      <ol class="timeline" id="timeline">
+        <li><b data-i18n="route.d1">День 0</b><p data-i18n="route.p1">Старт с космодрома «Рассвет». Восемь минут перегрузок, потом за окном чёрное небо.</p></li>
+        <li><b data-i18n="route.d2">День 1</b><p data-i18n="route.p2">Стыковка с лайнером «Аэлита-III» на околоземной орбите и заселение в каюты.</p></li>
+        <li><b data-i18n="route.d3">День 3</b><p data-i18n="route.p3">Разгон к Марсу. Земля в иллюминаторе становится размером с ладонь.</p></li>
+        <li><b data-i18n="route.d4">Дни 4–213</b><p data-i18n="route.p4">Перелёт: оранжерея, обсерватория, лекции планетологов и кино на куполе.</p></li>
+        <li><b data-i18n="route.d5">День 214</b><p data-i18n="route.p5">Выход на орбиту Марса. Фобос проносится под окнами каждые 7 ч 39 мин.</p></li>
+        <li><b data-i18n="route.d6">День 216</b><p data-i18n="route.p6">Посадка на базе «Элизий». Обратный рейс уходит со следующим окном, через 15 месяцев.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="chapter" id="cabins" style="--h:210vh">
+    <div class="panel">
+      <p class="label" data-i18n="cab.label">Этап 4 · Перелёт</p>
+      <h2 data-i18n-html="cab.title">Выберите <em>размер окна</em></h2>
+      <p class="lead" data-i18n="cab.lead">Во всех каютах земная гравитация, кухня шеф-повара и вид на космос. Классы отличаются тем, сколько космоса помещается в окно.</p>
+      <ul class="cabins">
+        <li class="cabin">
+          <svg viewBox="0 0 86 86" aria-hidden="true"><rect x="2" y="2" width="82" height="82" rx="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 5"/><circle cx="43" cy="43" r="13" fill="#1B1A2E" stroke="currentColor" stroke-width="5"/><circle cx="47" cy="39" r="3.6" fill="#D2502D"/><circle cx="37" cy="47" r="1" fill="#F2E6D0"/><circle cx="23" cy="43" r="1.6" fill="currentColor"/><circle cx="63" cy="43" r="1.6" fill="currentColor"/><circle cx="43" cy="23" r="1.6" fill="currentColor"/><circle cx="43" cy="63" r="1.6" fill="currentColor"/></svg>
+          <div><h3 data-i18n="cab.c1h">«Иллюминатор»</h3><p data-i18n="cab.c1">Каюта-капсула 4 м², круглое окно 40 см, общий салон на 12 человек.</p></div>
+          <div class="price"><small data-i18n="cab.from">от</small><strong data-price="0">42 млн ₽</strong></div>
+        </li>
+        <li class="cabin">
+          <svg viewBox="0 0 86 86" aria-hidden="true"><rect x="2" y="2" width="82" height="82" rx="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 5"/><circle cx="43" cy="43" r="27" fill="#1B1A2E" stroke="currentColor" stroke-width="5"/><circle cx="52" cy="36" r="8" fill="#D2502D"/><path d="M46 33c3 2 8 2 12 0" stroke="#A93B1F" stroke-width="2" fill="none"/><circle cx="30" cy="48" r="1.2" fill="#F2E6D0"/><circle cx="38" cy="58" r="1" fill="#F2E6D0"/><circle cx="33" cy="32" r="1.4" fill="#E9A23B"/><circle cx="56" cy="55" r="1" fill="#F2E6D0"/></svg>
+          <div><h3 data-i18n="cab.c2h">«Панорама»</h3><p data-i18n="cab.c2">Каюта 9 м² с панорамным окном 1,2 м и собственной ванной комнатой.</p></div>
+          <div class="price"><small data-i18n="cab.from">от</small><strong data-price="1">67 млн ₽</strong></div>
+        </li>
+        <li class="cabin">
+          <svg viewBox="0 0 86 86" aria-hidden="true"><circle cx="43" cy="43" r="38" fill="#1B1A2E" stroke="currentColor" stroke-width="3.5"/><ellipse cx="43" cy="43" rx="17" ry="38" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/><path d="M5 43h76" stroke="currentColor" stroke-width="1.2" opacity=".55"/><ellipse cx="43" cy="43" rx="38" ry="15" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/><circle cx="58" cy="30" r="9" fill="#D2502D"/><circle cx="26" cy="56" r="4" fill="#9CC6BD"/><path d="M28 24l1 3 3 1-3 1-1 3-1-3-3-1 3-1z" fill="#E9A23B"/><circle cx="50" cy="62" r="1.2" fill="#F2E6D0"/><circle cx="20" cy="36" r="1" fill="#F2E6D0"/></svg>
+          <div><h3 data-i18n="cab.c3h">Люкс «Аэлита»</h3><p data-i18n="cab.c3">Двухуровневый люкс 22 м² под стеклянным куполом на 360°. Звёзды прямо над кроватью.</p></div>
+          <div class="price"><small data-i18n="cab.from">от</small><strong data-price="2">113 млн ₽</strong></div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="chapter" id="mars" style="--h:210vh">
+    <div class="panel">
+      <p class="label" data-i18n="mars.label">Этап 5 · Марс</p>
+      <h2 data-i18n-html="mars.title">Добро пожаловать <em>на Красную планету</em></h2>
+      <ul class="sights">
+        <li><b data-i18n="mars.s1b">21,9 км</b><h3 data-i18n="mars.s1h">Олимп</h3><p data-i18n="mars.s1">Самый высокий вулкан Солнечной системы. Эверест поместился бы в нём два с половиной раза.</p></li>
+        <li><b data-i18n="mars.s2b">4 000 км</b><h3 data-i18n="mars.s2h">Долины Маринер</h3><p data-i18n="mars.s2">Каньон глубиной до 7 км. Рядом с ним Гранд-Каньон выглядит канавой.</p></li>
+        <li><b data-i18n="mars.s3b">0,38 g</b><h3 data-i18n="mars.s3h">Прыжок выше головы</h3><p data-i18n="mars.s3">Тяжесть здесь в 2,6 раза слабее земной. Баскетбольная площадка базы никогда не пустует.</p></li>
+        <li><b data-i18n="mars.s4b">−63 °C</b><h3 data-i18n="mars.s4h">Голубой закат</h3><p data-i18n="mars.s4">Пыль рассеивает свет так, что закаты на Марсе голубые. Смотреть лучше с террасы базы, шерстяные носки выдаём.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="booking" id="ticket">
+    <p class="label" data-i18n="book.label">Этап 6 · Билет</p>
+    <h2 data-i18n-html="book.title">Оформите <em>посадочный талон</em></h2>
+    <div class="booking-grid">
+      <form class="form" id="bookForm" novalidate>
+        <div class="form-head"><span data-i18n="book.form">Бланк заявки № 7-М</span><span id="seatsLeft">Осталось 4 места</span></div>
+        <fieldset>
+          <legend data-i18n="book.dest">Направление</legend>
+          <div class="choices">
+            <div class="opt"><input type="radio" name="dest" id="d-orbit" value="orbit"><label for="d-orbit"><i class="dest-glyph orbit"></i><b data-i18n="dest.orbit">Орбита</b><small data-i18n="dest.orbit.m">3 дня · 16 рассветов в сутки</small></label></div>
+            <div class="opt"><input type="radio" name="dest" id="d-moon" value="moon"><label for="d-moon"><i class="dest-glyph moon"></i><b data-i18n="dest.moon">Луна</b><small data-i18n="dest.moon.m">9 дней · ночь на базе</small></label></div>
+            <div class="opt"><input type="radio" name="dest" id="d-mars" value="mars" checked><label for="d-mars"><i class="dest-glyph mars"></i><b data-i18n="dest.mars">Марс</b><small data-i18n="dest.mars.m">≈ 29 мес. туда и обратно</small></label></div>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend data-i18n="book.date">Стартовое окно</legend>
+          <div class="pills" id="dateChoices"></div>
+        </fieldset>
+        <fieldset>
+          <legend data-i18n="book.class">Класс каюты</legend>
+          <div class="pills">
+            <div class="opt"><input type="radio" name="cls" id="c0" value="0"><label for="c0" data-i18n="cls.0">Иллюминатор</label></div>
+            <div class="opt"><input type="radio" name="cls" id="c1" value="1" checked><label for="c1" data-i18n="cls.1">Панорама</label></div>
+            <div class="opt"><input type="radio" name="cls" id="c2" value="2"><label for="c2" data-i18n="cls.2">Люкс «Аэлита»</label></div>
+          </div>
+        </fieldset>
+        <div class="row2">
+          <fieldset>
+            <legend data-i18n="book.pax">Пассажиры</legend>
+            <div class="stepper">
+              <button type="button" id="paxMinus" aria-label="Меньше пассажиров" data-i18n-aria="book.minus">−</button>
+              <output id="paxOut" aria-live="polite">2</output>
+              <button type="button" id="paxPlus" aria-label="Больше пассажиров" data-i18n-aria="book.plus">+</button>
+            </div>
+          </fieldset>
+          <fieldset class="field">
+            <legend><label for="paxName" data-i18n="book.name">Имя, как в паспорте</label></legend>
+            <input id="paxName" name="name" autocomplete="name" maxlength="24" value="Мстислав Лось" spellcheck="false">
+          </fieldset>
+        </div>
+        <div class="total">
+          <div><span data-i18n="book.total">Итого</span><strong id="totalOut">134 400 000 ₽</strong></div>
+          <span id="totalNote">2 пассажира · туда и обратно</span>
+        </div>
+        <button class="btn" type="submit" id="bookBtn" data-i18n="book.submit">Забронировать и напечатать</button>
+        <p class="note" data-i18n="book.note">Деньги не списываются: это демо-бронь выдуманной компании.</p>
+      </form>
+
+      <div class="ticket-col" id="ticketCol">
+        <div class="slot" aria-hidden="true"></div>
+        <div class="ticket-clip">
+          <article class="ticket" id="ticketCard" aria-label="Посадочный талон" data-i18n-aria="t.aria">
+            <div class="t-main">
+              <div class="t-band"><b><svg aria-hidden="true"><use href="#emblem"/></svg><span data-i18n="brand">АЭЛИТА</span></b><span data-i18n="t.pass">Посадочный талон</span></div>
+              <div class="t-route">
+                <div><span class="t-code">RSV</span><span class="t-city" data-i18n="t.from">Земля · «Рассвет»</span></div>
+                <div class="t-arc" aria-hidden="true">
+                  <svg viewBox="0 0 100 40" preserveAspectRatio="none"><path d="M2 36Q50-8 98 36" fill="none" stroke="#1B1A2E" stroke-width="1.5" stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/></svg>
+                  <svg style="position:absolute;left:50%;top:0;width:30px;height:15px;margin-left:-15px" viewBox="0 0 24 12"><use href="#mini-rocket"/></svg>
+                </div>
+                <div style="text-align:right"><span class="t-code flap" id="tTo">ELY</span><span class="t-city" id="tToCity">Марс · Элизий</span></div>
+              </div>
+              <div class="t-grid">
+                <div class="t-f wide"><small data-i18n="t.name">Пассажир</small><span class="flap" id="tName"></span></div>
+                <div class="t-f"><small data-i18n="t.flight">Рейс</small><span class="flap" id="tFlight"></span></div>
+                <div class="t-f"><small data-i18n="t.date">Дата старта</small><span class="flap" id="tDate"></span></div>
+                <div class="t-f"><small data-i18n="t.board">Посадка</small><span class="flap" id="tBoard"></span></div>
+                <div class="t-f"><small data-i18n="t.gate">Шлюз</small><span class="flap" id="tGate"></span></div>
+                <div class="t-f"><small data-i18n="t.class">Класс</small><span class="flap" id="tClass"></span></div>
+                <div class="t-f"><small data-i18n="t.seat">Место</small><span class="flap" id="tSeat"></span></div>
+                <div class="t-f"><small data-i18n="t.dur">В пути</small><span class="flap" id="tDur"></span></div>
+              </div>
+              <div class="t-total"><small><span data-i18n="book.total">Итого</span> · <span id="tPax">2</span></small><span class="flap" id="tPrice"></span></div>
+              <div class="stamp" aria-hidden="true"><span data-i18n-html="t.stamp">Оформлено<br>✦ AE ✦</span></div>
+            </div>
+            <div class="t-stub">
+              <div class="t-band"><span data-i18n="t.stub">Корешок</span></div>
+              <div class="t-stub-body">
+                <div class="t-f"><small data-i18n="t.flight">Рейс</small><span class="flap" id="sFlight"></span></div>
+                <div class="t-f"><small data-i18n="t.seat">Место</small><span class="flap" id="sSeat"></span></div>
+                <div class="t-f"><small data-i18n="t.date">Дата старта</small><span class="flap" id="sDate"></span></div>
+                <div><svg class="barcode" id="barcode" viewBox="0 0 120 58" preserveAspectRatio="none" aria-hidden="true"></svg><div class="t-code-small" id="bookCode">AE·0000</div></div>
+              </div>
+            </div>
+          </article>
+        </div>
+        <div class="confirm" id="confirm" hidden aria-live="polite">
+          <div id="confirmText"></div>
+          <button type="button" id="againBtn" data-i18n="book.again">Оформить ещё один билет</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <span class="word" data-i18n-html="foot.word">АЭЛИТА<em>межпланетные линии с 1962 года</em></span>
+  <div class="foot-grid">
+    <div><h3 data-i18n="foot.h1">Касса</h3><p data-i18n="foot.p1">Космодром «Рассвет», стартовый комплекс № 2. Открыто ежедневно с 06:40, в дни старта с полуночи.</p></div>
+    <div><h3 data-i18n="foot.h2">Справочная</h3><p><span>kassa@aelita.mars</span><br><span data-i18n="foot.p2">Отвечаем быстрее, чем идёт радиосигнал с Марса, а это до 22 минут.</span></p></div>
+    <div><h3 data-i18n="foot.h3">Разделы</h3><p><a href="#route" data-i18n="nav.route">Маршрут</a> · <a href="#cabins" data-i18n="nav.cabins">Каюты</a> · <a href="#mars" data-i18n="nav.mars">Марс</a> · <a href="#ticket" data-i18n="nav.ticket">Билет</a></p></div>
+  </div>
+  <div class="fine">
+    <p data-i18n="fine.1">Перевозчик вправе перенести рейс из-за пылевой бури, солнечной вспышки или парада планет.</p>
+    <p data-i18n="fine.2">Багаж сверх нормы отправляется следующим окном, через 26 месяцев.</p>
+    <p data-i18n="fine.3">Билеты, проданные с 1962 года, обмену не подлежат, но остаются действительны.</p>
+    <p data-i18n="fine.4">Лицензия межпланетного перевозчика № МП-000042. Возврат билета после отделения первой ступени не производится.</p>
+  </div>
+  <div class="foot-bottom"><span data-i18n="foot.copy">© 1962–2026 «Аэлита». Выдуманная компания, концепт-проект для портфолио.</span><a href="#launch" data-i18n="foot.top">↑ На старт</a></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* ================= helpers ================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const easeOut = t => 1 - Math.pow(1 - t, 3);
+const easeIn = t => t * t * t;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const root = document.documentElement;
+const hashStr = s => { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const plural = (n, one, few, many) => { const a = n % 10, b = n % 100; if (a === 1 && b !== 11) return one; if (a >= 2 && a <= 4 && (b < 10 || b >= 20)) return few; return many; };
+const hex = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+const mixRGB = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
+const rgbStr = c => `rgb(${c[0] | 0},${c[1] | 0},${c[2] | 0})`;
+const lum = c => { const f = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(c[0]) + .7152 * f(c[1]) + .0722 * f(c[2]); };
+
+/* ================= i18n ================= */
+const EN = {
+  'loader.title': 'Pre-launch <em>checklist</em>', 'loader.c1': 'Hull integrity', 'loader.c2': 'Fuel tanks', 'loader.c3': 'Engine warm-up', 'loader.c4': 'Crew aboard',
+  'brand': 'AELITA', 'brand.sub': 'interplanetary lines', 'nav.aria': 'Sections', 'nav.route': 'Route', 'nav.cabins': 'Cabins', 'nav.mars': 'Mars', 'nav.ticket': 'Tickets',
+  'cta.short': 'Buy a ticket', 'alti.aria': 'Flight stages',
+  'hero.label': 'Flight AE-042 · Earth → Mars', 'hero.title': 'See Mars <em>while it’s still red</em>',
+  'hero.lead': 'Scheduled passenger flights to the Red Planet. Seven months aboard, a view no hotel on Earth can offer, and a return ticket included.',
+  'u.d': 'days', 'u.h': 'hours', 'u.m': 'min', 'u.s': 'sec', 'cta.book': 'Reserve a seat', 'cta.how': 'How the flight works', 'hero.hint': 'Scroll down to start the countdown',
+  'ign.label': 'Stage 1 · Liftoff', 'ign.title': 'We launch when <em>Mars comes closer</em>',
+  'ign.lead': 'Earth and Mars line up once every 26 months. In that window the trip takes about seven months instead of years, so our timetable is set by orbital mechanics, not by the holiday season.',
+  'ign.f1b': '26 mo', 'ign.f1': 'between launch windows', 'ign.f2b': '≈ 7 mo', 'ign.f2': 'of travel to Mars', 'ign.f3': 'to first-stage separation',
+  'why.label': 'Stage 2 · Clouds', 'why.title': 'Why people fly <em>with Aelita</em>',
+  'why.r1h': 'Selling tickets since 1962', 'why.r1': 'We sold our first ticket to Mars 64 years ago. Every ticket sold since then is still valid, and this window carries their holders and their grandchildren.',
+  'why.r2h': 'Earth gravity on the way', 'why.r2': 'The liner’s habitat ring spins to create normal gravity. Your coffee stays in the cup, and you sleep in a bed, not in a bag strapped to the wall.',
+  'why.r3h': 'Lost suitcases', 'why.r3': 'Your luggage travels in the same capsule as you. The allowance is 20 kg per passenger, not counting the spacesuit.',
+  'route.label': 'Stage 3 · Orbit', 'route.title': '216 days <em>from doorstep to crater</em>',
+  'route.d1': 'Day 0', 'route.p1': 'Liftoff from Rassvet Spaceport. Eight minutes of g-force, then a black sky outside the window.',
+  'route.d2': 'Day 1', 'route.p2': 'Docking with the Aelita III liner in Earth orbit. Check-in to your cabin.',
+  'route.d3': 'Day 3', 'route.p3': 'Burn for Mars. Earth shrinks to the size of your palm.',
+  'route.d4': 'Days 4–213', 'route.p4': 'Cruise: greenhouse, observatory, talks by planetary scientists and films on the dome.',
+  'route.d5': 'Day 214', 'route.p5': 'Mars orbit insertion. Phobos sweeps past the windows every 7 h 39 min.',
+  'route.d6': 'Day 216', 'route.p6': 'Landing at Elysium Base. The return flight leaves with the next window, 15 months later.',
+  'cab.label': 'Stage 4 · Cruise', 'cab.title': 'Choose <em>your window size</em>',
+  'cab.lead': 'Every cabin has Earth gravity, a chef’s kitchen and a view of space. The classes differ in how much space fits in the window.',
+  'cab.c1h': 'Porthole', 'cab.c1': 'A 4 m² capsule cabin with a 40 cm round window and a shared lounge for 12.',
+  'cab.c2h': 'Panorama', 'cab.c2': 'A 9 m² cabin with a 1.2 m panoramic window and a private bathroom.',
+  'cab.c3h': 'Aelita Suite', 'cab.c3': 'A 22 m² two-level suite under a 360° glass dome. Stars right above the bed.', 'cab.from': 'from',
+  'mars.label': 'Stage 5 · Mars', 'mars.title': 'Welcome <em>to the Red Planet</em>',
+  'mars.s1b': '21.9 km', 'mars.s1h': 'Olympus Mons', 'mars.s1': 'The tallest volcano in the Solar System. Everest would fit inside it two and a half times.',
+  'mars.s2b': '4,000 km', 'mars.s2h': 'Valles Marineris', 'mars.s2': 'A canyon up to 7 km deep. Next to it, the Grand Canyon looks like a ditch.',
+  'mars.s3b': '0.38 g', 'mars.s3h': 'Jump over your head', 'mars.s3': 'Gravity is 2.6 times weaker than on Earth. The base basketball court is never empty.',
+  'mars.s4b': '−63 °C', 'mars.s4h': 'Blue sunsets', 'mars.s4': 'Martian dust scatters light so that sunsets turn blue. Watch them from the base terrace; wool socks are provided.',
+  'book.label': 'Stage 6 · Ticket', 'book.title': 'Get your <em>boarding pass</em>', 'book.form': 'Application form No. 7-M',
+  'book.dest': 'Destination', 'dest.orbit': 'Orbit', 'dest.orbit.m': '3 days · 16 sunrises a day', 'dest.moon': 'Moon', 'dest.moon.m': '9 days · a night at the base',
+  'dest.mars': 'Mars', 'dest.mars.m': '≈ 29 months round trip', 'book.date': 'Launch window', 'book.class': 'Cabin class',
+  'cls.0': 'Porthole', 'cls.1': 'Panorama', 'cls.2': 'Aelita Suite', 'book.pax': 'Passengers', 'book.minus': 'Fewer passengers', 'book.plus': 'More passengers',
+  'book.name': 'Name as in passport', 'book.total': 'Total', 'book.submit': 'Book and print the ticket',
+  'book.note': 'No money is charged: this is a demo booking for a fictional company.',
+  't.aria': 'Boarding pass', 't.pass': 'Boarding pass', 't.from': 'Earth · Rassvet', 't.name': 'Passenger', 't.flight': 'Flight', 't.date': 'Launch date',
+  't.board': 'Boarding', 't.gate': 'Airlock', 't.class': 'Class', 't.seat': 'Seat', 't.dur': 'Travel time', 't.stamp': 'Issued<br>✦ AE ✦', 't.stub': 'Stub',
+  'book.again': 'Book another ticket',
+  'foot.word': 'AELITA<em>interplanetary lines since 1962</em>', 'foot.h1': 'Ticket office',
+  'foot.p1': 'Rassvet Spaceport, Launch Complex 2. Open daily from 06:40, and from midnight on launch days.',
+  'foot.h2': 'Enquiries', 'foot.p2': 'We reply faster than a radio signal travels from Mars, which takes up to 22 minutes.', 'foot.h3': 'Sections',
+  'fine.1': 'The carrier may reschedule a flight because of a dust storm, a solar flare or a planetary alignment.',
+  'fine.2': 'Excess baggage travels with the next window, 26 months later.',
+  'fine.3': 'Tickets sold since 1962 cannot be exchanged but remain valid.',
+  'fine.4': 'Interplanetary carrier licence No. MP-000042. No refunds after first-stage separation.',
+  'foot.copy': '© 1962–2026 Aelita. A fictional company, portfolio concept project.', 'foot.top': '↑ Back to launch'
+};
+const RU = {};
+$$('[data-i18n]').forEach(el => RU[el.dataset.i18n] = el.textContent);
+$$('[data-i18n-html]').forEach(el => RU[el.dataset.i18nHtml] = el.innerHTML);
+$$('[data-i18n-aria]').forEach(el => RU[el.dataset.i18nAria] = el.getAttribute('aria-label'));
+
+const L = {
+  ru: {
+    alt: 'ВЫСОТА', path: 'ПРОЙДЕНО', km: 'км', mln: 'млн км', day: 'ДЕНЬ',
+    cd: n => `До открытия окна «${n}»`, win: y => `Марс-${y}`,
+    seats: n => `Осталось ${n} ${plural(n, 'место', 'места', 'мест')}`, seatsShort: n => `${n} ${plural(n, 'место', 'места', 'мест')}`,
+    pax: n => `${n} ${plural(n, 'пассажир', 'пассажира', 'пассажиров')} · туда и обратно`, paxShort: n => `${n} пасс.`,
+    months: ['ЯНВ', 'ФЕВ', 'МАР', 'АПР', 'МАЙ', 'ИЮН', 'ИЮЛ', 'АВГ', 'СЕН', 'ОКТ', 'НОЯ', 'ДЕК'],
+    cls: ['ИЛЛЮМИНАТОР', 'ПАНОРАМА', 'ЛЮКС'], yourName: 'ВАШЕ ИМЯ', nameErr: 'Впишите имя пассажира',
+    stages: ['Старт', 'Зажигание', 'Облака', 'Орбита', 'Перелёт', 'Марс', 'Билет'],
+    confirm: (code, n) => `Бронь <b>${code}</b> оформлена, пассажиров: ${n}. Медкомиссия проходит за 60 дней до старта, багаж сдаётся за сутки. Шерстяные носки положите в ручную кладь.`,
+    pool: 'АБВГДЕЖЗИКЛМНОПРСТУФХЭЮЯ0123456789', money: v => `${Math.round(v).toLocaleString('ru-RU')} ₽`,
+    short: v => `${Math.round(v / 1e6)} млн ₽`, name: 'Мстислав Лось', title: 'Межпланетные линии «Аэлита»'
+  },
+  en: {
+    alt: 'ALTITUDE', path: 'TRAVELLED', km: 'km', mln: 'M km', day: 'DAY',
+    cd: n => `The ${n} window opens in`, win: y => `Mars-${y}`,
+    seats: n => `${n} ${n === 1 ? 'seat' : 'seats'} left`, seatsShort: n => `${n} left`,
+    pax: n => `${n} ${n === 1 ? 'passenger' : 'passengers'} · round trip`, paxShort: n => `${n} pax`,
+    months: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+    cls: ['PORTHOLE', 'PANORAMA', 'SUITE'], yourName: 'YOUR NAME', nameErr: 'Enter the passenger name',
+    stages: ['Launch', 'Ignition', 'Clouds', 'Orbit', 'Cruise', 'Mars', 'Ticket'],
+    confirm: (code, n) => `Booking <b>${code}</b> is confirmed for ${n} ${n === 1 ? 'passenger' : 'passengers'}. The medical check is 60 days before launch, and bags are checked in a day early. Pack wool socks in your carry-on.`,
+    pool: 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789', money: v => `$${Math.round(v).toLocaleString('en-US')}`,
+    short: v => v >= 1e6 ? `$${(v / 1e6).toFixed(2)}M` : `$${Math.round(v / 1e3)}K`, name: 'Mstislav Los', title: 'Aelita Interplanetary Lines'
+  }
+};
+
+let lang = 'ru';
+try { const s = localStorage.getItem('aelita-lang'); if (s === 'en' || s === 'ru') lang = s; } catch (e) {}
+const tr = key => (lang === 'en' ? EN[key] : RU[key]) ?? RU[key] ?? key;
+
+function applyLang(l, first) {
+  lang = l; root.lang = l;
+  $$('[data-i18n]').forEach(el => { el.textContent = tr(el.dataset.i18n); });
+  $$('[data-i18n-html]').forEach(el => { el.innerHTML = tr(el.dataset.i18nHtml); });
+  $$('[data-i18n-aria]').forEach(el => el.setAttribute('aria-label', tr(el.dataset.i18nAria)));
+  $$('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === l)));
+  document.title = L[l].title;
+  const nm = $('#paxName');
+  if (nm.value === L.ru.name && l === 'en') nm.value = L.en.name;
+  else if (nm.value === L.en.name && l === 'ru') nm.value = L.ru.name;
+  state.name = nm.value;
+  buildAlti(); renderDates(); updateCabinPrices(); updateCountdown(); updateBooking(!!first);
+  lastUI = -1;
+  if (!first) { try { localStorage.setItem('aelita-lang', l); } catch (e) {} }
+  requestAnimationFrame(measure);
+}
+$$('.lang button').forEach(b => b.addEventListener('click', () => { if (b.dataset.lang !== lang) applyLang(b.dataset.lang); }));
+
+/* ================= story time from scroll ================= */
+const SECTION_IDS = ['launch', 'ignition', 'why', 'route', 'cabins', 'mars', 'ticket'];
+let secTops = [], docMax = 1;
+function measure() {
+  secTops = SECTION_IDS.map(id => document.getElementById(id).getBoundingClientRect().top + scrollY);
+  docMax = Math.max(1, root.scrollHeight - innerHeight);
+}
+function computeT() {
+  const r = scrollY, n = secTops.length;
+  for (let i = n - 1; i >= 0; i--) {
+    if (r >= secTops[i] - 1) {
+      const end = i < n - 1 ? secTops[i + 1] : docMax;
+      return Math.min(n, i + clamp((r - secTops[i]) / Math.max(1, end - secTops[i])));
+    }
+  }
+  return 0;
+}
+
+/* ================= sky ================= */
+const SKY = [
+  [0, '#EFAE86', '#F4CFA4', '#F6E4C8'], [0.9, '#ECA07C', '#F2C69C', '#F5DEBF'],
+  [1.6, '#9FC5BC', '#DCE4CF', '#F3E7D1'], [2.3, '#5E9A98', '#A9CCC2', '#E6E6D2'],
+  [2.62, '#1D5559', '#2F6F72', '#9CC6BD'], [3.0, '#1B1A2E', '#1F3A4C', '#2F6B6E'],
+  [3.6, '#151427', '#1B1A2E', '#1E3243'], [4.6, '#141326', '#1B1A2E', '#1B1A2E'],
+  [5.6, '#16152A', '#1D1A30', '#3A2030'], [7, '#16152A', '#1C1930', '#3C2131']
+].map(k => [k[0], hex(k[1]), hex(k[2]), hex(k[3])]);
+let sky = [SKY[0][1], SKY[0][2], SKY[0][3]];
+function skyAt(t) {
+  for (let i = 0; i < SKY.length - 1; i++) {
+    const a = SKY[i], b = SKY[i + 1];
+    if (t <= b[0]) { const u = easeInOut(seg(t, a[0], b[0])); return [mixRGB(a[1], b[1], u), mixRGB(a[2], b[2], u), mixRGB(a[3], b[3], u)]; }
+  }
+  const z = SKY[SKY.length - 1]; return [z[1], z[2], z[3]];
+}
+/* f: 0 = bottom of viewport, 1 = top */
+const skySample = f => f < .42 ? mixRGB(sky[2], sky[1], f / .42) : mixRGB(sky[1], sky[0], (f - .42) / .58);
+const skyEl = $('#sky');
+function paintSky() {
+  root.style.setProperty('--sky-t', rgbStr(sky[0]));
+  root.style.setProperty('--sky-m', rgbStr(sky[1]));
+  root.style.setProperty('--sky-b', rgbStr(sky[2]));
+}
+function setTone(el, l) {
+  const cur = el.dataset.tone;
+  let next = cur;
+  if (!cur) next = l > .18 ? 'light' : 'dark';
+  else if (cur === 'light' && l < .17) next = 'dark';
+  else if (cur === 'dark' && l > .2) next = 'light';
+  if (next !== cur) el.dataset.tone = next;
+}
+
+/* ================= altimeter ================= */
+const alti = $('#alti'), altiList = $('#altiList');
+function buildAlti() {
+  altiList.innerHTML = '';
+  L[lang].stages.forEach((name, i) => {
+    const li = document.createElement('li');
+    li.style.top = (i / 6 * 100) + '%';
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = name; b.dataset.i = i;
+    b.addEventListener('click', () => jumpTo(i));
+    li.appendChild(b); altiList.appendChild(li);
+  });
+}
+const ALT_KEYS = [[1.05, .01], [2, 12], [3, 400], [4.5, 384400], [6, 225e6]];
+function distanceAt(t) {
+  if (t < 1.05) return 0;
+  for (let i = 0; i < ALT_KEYS.length - 1; i++) {
+    const a = ALT_KEYS[i], b = ALT_KEYS[i + 1];
+    if (t <= b[0]) return Math.exp(lerp(Math.log(a[1]), Math.log(b[1]), seg(t, a[0], b[0])));
+  }
+  return 225e6;
+}
+function fmtDist(v) {
+  const k = L[lang];
+  if (v < 100) return v.toFixed(1).replace('.', lang === 'ru' ? ',' : '.') + ' ' + k.km;
+  if (v < 1e6) return Math.round(v).toLocaleString(lang === 'ru' ? 'ru-RU' : 'en-US') + ' ' + k.km;
+  return (v / 1e6).toFixed(v < 1e7 ? 1 : 0).replace('.', lang === 'ru' ? ',' : '.') + ' ' + k.mln;
+}
+function clockAt(t) {
+  const p = n => String(Math.floor(n)).padStart(2, '0');
+  if (t < 1.05) { const s = Math.ceil(10 * (1 - t / 1.05)); return `T−00:${p(s)}`; }
+  if (t < 3.2) { const s = lerp(0, 520, easeIn(seg(t, 1.05, 3.2)) * .6 + seg(t, 1.05, 3.2) * .4); return `T+${p(s / 60)}:${p(s % 60)}`; }
+  const d = t < 4.5 ? lerp(1, 3, seg(t, 3.2, 4.5)) : t < 6 ? lerp(3, 214, seg(t, 4.5, 6)) : lerp(214, 216, seg(t, 6, 6.6));
+  return `${L[lang].day} ${Math.floor(d)}`;
+}
+const chipBox = $('.alti-chip');
+const altiFill = $('#altiFill'), altiMark = $('#altiMark'), altiValue = $('#altiValue'), altiLabel = $('#altiLabel'), altiClock = $('#altiClock'), chip = $('#chipValue');
+const timelineItems = $$('#timeline li');
+let lastStep = -1;
+function updateAlti(t) {
+  alti.classList.toggle('away', t > 5.72);
+  chipBox.classList.toggle('away', t > 5.9);
+  const f = clamp(t / 6);
+  altiFill.style.height = (f * 100) + '%';
+  altiMark.style.top = (f * 100) + '%';
+  const dist = fmtDist(distanceAt(t));
+  altiValue.textContent = dist;
+  altiLabel.textContent = t < 3.2 ? L[lang].alt : L[lang].path;
+  altiClock.textContent = clockAt(t);
+  chip.textContent = `${clockAt(t)} · ${dist}`;
+  const step = Math.min(6, Math.floor(t + .35));
+  if (step !== lastStep) {
+    $$('button', altiList).forEach((b, i) => { if (i === step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    lastStep = step;
+  }
+  timelineItems.forEach((li, k) => li.classList.toggle('on', t >= 2.85 + k * .2));
+}
+function jumpTo(i) {
+  const top = i === 0 ? 0 : secTops[i];
+  scrollTo({ top, behavior: REDUCED ? 'auto' : 'smooth' });
+}
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a) return;
+  const id = a.getAttribute('href').slice(1);
+  const i = SECTION_IDS.indexOf(id);
+  if (i < 0) return;
+  e.preventDefault(); jumpTo(i);
+});
+
+/* ================= countdown ================= */
+const MARS_WINDOWS = ['2026-11-14T01:40:00Z', '2029-01-21T01:40:00Z', '2031-04-03T01:40:00Z', '2033-05-28T01:40:00Z'].map(s => new Date(s));
+function marsWindows(count) {
+  const now = Date.now(), out = [];
+  let i = 0, d = MARS_WINDOWS[0];
+  while (out.length < count) {
+    if (d.getTime() > now) out.push(d);
+    i++;
+    d = i < MARS_WINDOWS.length ? MARS_WINDOWS[i] : new Date(d.getTime() + 780 * 864e5);
+  }
+  return out;
+}
+function updateCountdown() {
+  const w = marsWindows(1)[0];
+  let s = Math.max(0, Math.floor((w.getTime() - Date.now()) / 1000));
+  const d = Math.floor(s / 86400); s -= d * 86400;
+  const h = Math.floor(s / 3600); s -= h * 3600;
+  const m = Math.floor(s / 60); s -= m * 60;
+  const p = n => String(n).padStart(2, '0');
+  $('#cdD').textContent = p(d); $('#cdH').textContent = p(h); $('#cdM').textContent = p(m); $('#cdS').textContent = p(s);
+  $('#cdLabel').textContent = L[lang].cd(L[lang].win(String(w.getUTCFullYear()).slice(2)));
+}
+setInterval(updateCountdown, 1000);
+
+/* ================= booking ================= */
+const DEST = {
+  orbit: { code: 'RNG', flight: 'AE-301', gate: 1, base: { ru: 4.9e6, en: 54000 }, dur: { ru: '3 ДНЯ', en: '3 DAYS' }, city: { ru: 'Орбита · «Кольцо-1»', en: 'Orbit · Ring-1' }, seats: [9, 14, 22], period: 14, anchor: '2026-10-18T01:40:00Z' },
+  moon: { code: 'TRQ', flight: 'AE-117', gate: 2, base: { ru: 19.5e6, en: 215000 }, dur: { ru: '9 ДНЕЙ', en: '9 DAYS' }, city: { ru: 'Луна · Море Спокойствия', en: 'Moon · Sea of Tranquility' }, seats: [6, 11, 18], period: 28, anchor: '2026-12-12T01:40:00Z' },
+  mars: { code: 'ELY', flight: 'AE-042', gate: 3, base: { ru: 42e6, en: 460000 }, dur: { ru: '29 МЕС.', en: '29 MONTHS' }, city: { ru: 'Марс · Элизий', en: 'Mars · Elysium' }, seats: [4, 31, 48] }
+};
+const CLS_MULT = [1, 1.6, 2.7];
+const state = { dest: 'mars', date: 0, cls: 1, pax: 2, name: $('#paxName').value };
+function datesFor(key) {
+  const d = DEST[key];
+  if (key === 'mars') return marsWindows(3);
+  const now = Date.now(), step = d.period * 864e5;
+  let t = new Date(d.anchor).getTime();
+  while (t <= now) t += step;
+  return [0, 1, 2].map(i => new Date(t + i * step));
+}
+const fmtDate = dt => `${String(dt.getUTCDate()).padStart(2, '0')} ${L[lang].months[dt.getUTCMonth()]} ${dt.getUTCFullYear()}`;
+function renderDates() {
+  const box = $('#dateChoices'), dates = datesFor(state.dest), seats = DEST[state.dest].seats;
+  box.innerHTML = dates.map((dt, i) => `<div class="opt"><input type="radio" name="date" id="dt${i}" value="${i}"${i === state.date ? ' checked' : ''}><label for="dt${i}">${fmtDate(dt)} <em>${L[lang].seatsShort(seats[i])}</em></label></div>`).join('');
+}
+function updateCabinPrices() {
+  $$('[data-price]').forEach(el => { el.textContent = L[lang].short(DEST.mars.base[lang] * CLS_MULT[+el.dataset.price]); });
+}
+
+function flap(el, text, instant) {
+  text = String(text);
+  if (el._final === text) return;
+  el._final = text;
+  clearInterval(el._timer);
+  if (instant || REDUCED) { el.textContent = text; return; }
+  const pool = L[lang].pool, chars = Array.from(text), n = chars.length;
+  const start = chars.map((c, i) => Math.floor(i * .7));
+  const cycles = chars.map(() => 3 + Math.floor(Math.random() * 4));
+  let f = 0;
+  el._timer = setInterval(() => {
+    f++;
+    let s = '', done = true;
+    for (let i = 0; i < n; i++) {
+      const c = chars[i];
+      if (c === ' ' || f >= start[i] + cycles[i]) s += c;
+      else { done = false; s += pool[Math.floor(Math.random() * pool.length)]; }
+    }
+    el.textContent = s;
+    if (done) clearInterval(el._timer);
+  }, 40);
+}
+
+const col = $('#ticketCol'), confirmBox = $('#confirm');
+let bookingCode = '';
+function booking() {
+  const d = DEST[state.dest], dt = datesFor(state.dest)[state.date];
+  const nameUp = (state.name.trim() || L[lang].yourName).toUpperCase();
+  const seed = hashStr([state.dest, state.date, state.cls, state.pax, state.name.trim().toLowerCase()].join('|'));
+  const r = rng(seed);
+  let seat;
+  if (state.cls === 2) seat = 'L' + (1 + Math.floor(r() * 4));
+  else if (state.cls === 1) seat = String(4 + Math.floor(r() * 8)).padStart(2, '0') + (r() < .5 ? 'A' : 'F');
+  else seat = String(14 + Math.floor(r() * 16)).padStart(2, '0') + 'ABCDEF'[Math.floor(r() * 6)];
+  if (state.pax > 1) seat += ` +${state.pax - 1}`;
+  const alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+  let code = 'AE·';
+  for (let i = 0; i < 4; i++) code += alphabet[Math.floor(r() * alphabet.length)];
+  const price = d.base[lang] * CLS_MULT[state.cls] * state.pax;
+  return { d, dt, nameUp, seat, code, price, seed, gate: `${d.gate}-${1 + Math.floor(r() * 9)}` };
+}
+function drawBarcode(seed) {
+  const r = rng(seed ^ 0x9e3779b9);
+  let x = 3, out = '';
+  while (x < 116) {
+    const w = .8 + Math.floor(r() * 3) * .9;
+    out += `<rect x="${x.toFixed(2)}" y="0" width="${w.toFixed(2)}" height="58" fill="#1B1A2E"/>`;
+    x += w + .9 + r() * 2.1;
+  }
+  $('#barcode').innerHTML = out;
+}
+function updateBooking(instant) {
+  const b = booking(), k = L[lang];
+  bookingCode = b.code;
+  $('#totalOut').textContent = k.money(b.price);
+  $('#totalNote').textContent = k.pax(state.pax);
+  $('#seatsLeft').textContent = k.seats(b.d.seats[state.date]);
+  $('#paxOut').textContent = state.pax;
+  $('#paxMinus').disabled = state.pax <= 1;
+  $('#paxPlus').disabled = state.pax >= 6;
+  $('#tToCity').textContent = b.d.city[lang];
+  $('#tPax').textContent = k.paxShort(state.pax);
+  flap($('#tTo'), b.d.code, instant);
+  flap($('#tName'), b.nameUp, instant);
+  flap($('#tFlight'), b.d.flight, instant);
+  flap($('#tDate'), fmtDate(b.dt), instant);
+  flap($('#tBoard'), '03:40', instant);
+  flap($('#tGate'), b.gate, instant);
+  flap($('#tClass'), k.cls[state.cls], instant);
+  flap($('#tSeat'), b.seat, instant);
+  flap($('#tDur'), b.d.dur[lang], instant);
+  flap($('#tPrice'), k.money(b.price), instant);
+  flap($('#sFlight'), b.d.flight, instant);
+  flap($('#sSeat'), b.seat.split(' ')[0], instant);
+  flap($('#sDate'), fmtDate(b.dt), instant);
+  $('#bookCode').textContent = b.code;
+  drawBarcode(b.seed);
+}
+function unprint() {
+  if (col.classList.contains('printed')) { col.classList.remove('printed'); confirmBox.hidden = true; }
+}
+const form = $('#bookForm'), nameInput = $('#paxName');
+form.addEventListener('change', e => {
+  const el = e.target;
+  if (el.name === 'dest') { state.dest = el.value; state.date = 0; renderDates(); }
+  else if (el.name === 'date') state.date = +el.value;
+  else if (el.name === 'cls') state.cls = +el.value;
+  else return;
+  unprint(); updateBooking();
+});
+let nameTimer;
+nameInput.addEventListener('input', () => {
+  state.name = nameInput.value;
+  nameInput.removeAttribute('aria-invalid');
+  clearTimeout(nameTimer);
+  nameTimer = setTimeout(() => { unprint(); updateBooking(); }, 180);
+});
+$('#paxMinus').addEventListener('click', () => { state.pax = Math.max(1, state.pax - 1); unprint(); updateBooking(); });
+$('#paxPlus').addEventListener('click', () => { state.pax = Math.min(6, state.pax + 1); unprint(); updateBooking(); });
+let busy = false;
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  if (busy) return;
+  if (!state.name.trim()) {
+    nameInput.setAttribute('aria-invalid', 'true');
+    nameInput.placeholder = L[lang].nameErr;
+    nameInput.focus();
+    return;
+  }
+  busy = true;
+  confirmBox.hidden = true;
+  col.classList.remove('printed');
+  col.classList.add('retract');
+  if (innerWidth <= 900) col.scrollIntoView({ block: 'center', behavior: REDUCED ? 'auto' : 'smooth' });
+  setTimeout(() => {
+    updateBooking(true);
+    col.classList.remove('retract');
+    col.classList.add('printing');
+  }, REDUCED ? 0 : 420);
+  setTimeout(() => {
+    col.classList.remove('printing');
+    col.classList.add('printed');
+    $('#confirmText').innerHTML = L[lang].confirm(bookingCode, state.pax);
+    confirmBox.hidden = false;
+    busy = false;
+  }, REDUCED ? 60 : 2250);
+});
+$('#againBtn').addEventListener('click', () => {
+  unprint();
+  nameInput.value = ''; state.name = '';
+  nameInput.placeholder = L[lang].yourName;
+  nameInput.focus();
+  updateBooking();
+});
+
+/* ================= frame loop ================= */
+const header = $('#top');
+const panels = $$('.chapter .panel');
+const pointer = { x: 0, y: 0 };
+if (matchMedia('(pointer: fine)').matches) {
+  addEventListener('pointermove', e => { pointer.x = e.clientX / innerWidth * 2 - 1; pointer.y = e.clientY / innerHeight * 2 - 1; }, { passive: true });
+}
+let scene = null;
+let tCur = 0, lastUI = -1, lastNow = performance.now();
+function frame(now) {
+  const dt = Math.min(.05, (now - lastNow) / 1000); lastNow = now;
+  const target = computeT();
+  tCur = REDUCED ? target : tCur + (target - tCur) * (1 - Math.exp(-dt * 5.5));
+  if (Math.abs(target - tCur) < 1e-4) tCur = target;
+  if (Math.abs(tCur - lastUI) > 1e-4) {
+    sky = skyAt(tCur);
+    const vh = innerHeight;
+    const rects = panels.map(p => p.getBoundingClientRect());
+    paintSky();
+    setTone(header, lum(skySample(.96)));
+    setTone(alti, lum(skySample(.5)));
+    rects.forEach((r, i) => {
+      if (r.bottom < -50 || r.top > vh + 50) return;
+      const c = clamp(1 - ((r.top + Math.min(r.height, vh) / 2) / vh));
+      setTone(panels[i], lum(skySample(c)));
+    });
+    updateAlti(tCur);
+    lastUI = tCur;
+  }
+  if (scene) scene.render(tCur, dt, now / 1000, pointer);
+  requestAnimationFrame(frame);
+}
+
+/* ================= loader ================= */
+const loader = $('#loader'), checks = $$('#checks li');
+let checkIdx = 0, sceneReady = false, fontsReady = false, loaderDone = false;
+const loaderStart = performance.now();
+function finishLoader() {
+  if (loaderDone) return;
+  loaderDone = true;
+  loader.classList.add('done');
+  setTimeout(() => { loader.hidden = true; }, 1100);
+}
+const checkTimer = setInterval(() => {
+  if (checkIdx < checks.length) {
+    const li = checks[checkIdx];
+    li.classList.add('ok');
+    li.lastElementChild.textContent = checkIdx === 1 ? '100%' : '✓';
+    checkIdx++;
+    $('#loaderBar').style.width = (checkIdx / checks.length * 100) + '%';
+  }
+  const elapsed = performance.now() - loaderStart;
+  if ((checkIdx >= checks.length && sceneReady && fontsReady) || elapsed > 4500) {
+    clearInterval(checkTimer);
+    setTimeout(finishLoader, REDUCED ? 0 : 280);
+  }
+}, REDUCED ? 60 : 330);
+(document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { fontsReady = true; measure(); });
+
+/* ================= boot ================= */
+function boot() {
+  applyLang(lang, true);
+  measure();
+  addEventListener('resize', () => { measure(); if (scene) scene.resize(); lastUI = -1; });
+  if ('ResizeObserver' in window) new ResizeObserver(() => { measure(); lastUI = -1; }).observe(document.body);
+  try { scene = initScene(); } catch (err) { console.warn('3D scene disabled:', err); scene = null; }
+  if (!scene) root.classList.add('no-webgl');
+  sceneReady = true;
+  requestAnimationFrame(frame);
+}
+/* ================= 3D: poster-lithograph scene ================= */
+const GLSL_HALFTONE = `
+uniform float uPR;
+float halftone(vec2 fc, float cell, float cover){
+  vec2 q = mat2(.7071,-.7071,.7071,.7071) * (fc / (cell * uPR));
+  float d = length(fract(q) - .5);
+  float r = sqrt(cover) * .5;
+  float aa = .8 / (cell * uPR);
+  return 1. - smoothstep(r - aa, r + aa, d);
+}`;
+const GLSL_NOISE = `
+float hash3(vec3 p){ p = fract(p * .3183099 + vec3(.11,.23,.37)); p *= 17.; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
+float vnoise(vec3 x){ vec3 i = floor(x); vec3 f = fract(x); f = f * f * (3. - 2. * f);
+  return mix(mix(mix(hash3(i), hash3(i + vec3(1,0,0)), f.x), mix(hash3(i + vec3(0,1,0)), hash3(i + vec3(1,1,0)), f.x), f.y),
+             mix(mix(hash3(i + vec3(0,0,1)), hash3(i + vec3(1,0,1)), f.x), mix(hash3(i + vec3(0,1,1)), hash3(i + vec3(1,1,1)), f.x), f.y), f.z); }
+float fbm(vec3 p){ float a = .5, s = 0.; for (int i = 0; i < 5; i++){ s += a * vnoise(p); p = p * 2.02 + vec3(3.1,1.7,5.3); a *= .5; } return s; }`;
+const VS = `
+varying vec3 vN; varying vec3 vWP; varying vec2 vUv; varying vec3 vOP;
+void main(){
+  vec4 p = vec4(position, 1.);
+  vec3 n = normal;
+  #ifdef USE_INSTANCING
+    p = instanceMatrix * p; n = mat3(instanceMatrix) * n;
+  #endif
+  vec4 wp = modelMatrix * p;
+  vWP = wp.xyz; vN = normalize(mat3(modelMatrix) * n); vUv = uv; vOP = position;
+  gl_Position = projectionMatrix * viewMatrix * wp;
+}`;
+const FS_POSTER = `
+uniform vec3 uLit; uniform vec3 uMid; uniform vec3 uShade; uniform vec3 uLight; uniform vec3 uRim;
+uniform float uHalftone; uniform float uRimAmt;
+#ifdef POSTER_MAP
+uniform sampler2D uMap;
+#endif
+varying vec3 vN; varying vec3 vWP; varying vec2 vUv;
+${GLSL_HALFTONE}
+void main(){
+  vec3 n = normalize(vN);
+  n = gl_FrontFacing ? n : -n;
+  float d = dot(n, normalize(uLight));
+  float w = fwidth(d) + .002;
+  float s1 = smoothstep(-.02 - w, -.02 + w, d);
+  float s2 = smoothstep(.5 - w, .5 + w, d);
+  #ifdef POSTER_MAP
+    vec3 b = texture2D(uMap, vUv).rgb;
+    vec3 col = mix(mix(b * uShade, b * uMid, s1), b * uLit, s2);
+  #else
+    vec3 col = mix(mix(uShade, uMid, s1), uLit, s2);
+  #endif
+  col = mix(col, col * .8, halftone(gl_FragCoord.xy, 4.5, .3) * (1. - s1) * uHalftone);
+  if (uRimAmt > 0.) {
+    float fr = 1. - max(dot(n, normalize(cameraPosition - vWP)), 0.);
+    col = mix(col, uRim, smoothstep(uRimAmt - .03, uRimAmt + .03, fr) * s1);
+  }
+  gl_FragColor = vec4(col, 1.);
+}`;
+const FS_PLANET = `
+uniform vec3 uLight; uniform vec3 uRim; uniform float uRimAmt; uniform float uTime;
+varying vec3 vN; varying vec3 vWP; varying vec3 vOP;
+${GLSL_HALFTONE}
+${GLSL_NOISE}
+void main(){
+  vec3 p = normalize(vOP);
+  vec3 base;
+  #if PLANET == 1
+    float h = fbm(p * 1.8 + 4.);
+    base = vec3(.122,.369,.388);
+    base = mix(base, vec3(.18,.478,.486), smoothstep(.47,.48,h));
+    base = mix(base, vec3(.918,.843,.682), smoothstep(.55,.557,h));
+    base = mix(base, vec3(.851,.663,.416), smoothstep(.62,.627,h));
+    base = mix(base, vec3(1.,.965,.902), smoothstep(.86,.87, abs(p.y) + .06 * vnoise(p * 6.)));
+    float cl = fbm(vec3(p.x * 2.4, p.y * 7., p.z * 2.4) + vec3(uTime * .015, 0., 0.));
+    base = mix(base, vec3(1.,.965,.902), smoothstep(.63,.637,cl));
+  #elif PLANET == 2
+    float h = fbm(p * 2.1 + 1.3);
+    base = vec3(.824,.314,.176);
+    base = mix(base, vec3(.663,.231,.122), 1. - smoothstep(.41,.418,h));
+    base = mix(base, vec3(.91,.475,.353), smoothstep(.6,.607,h));
+    float cany = 1. - smoothstep(.012,.02, abs(p.y + .1 + .07 * (vnoise(p * 5.) - .5)));
+    cany *= smoothstep(-.3,.1,p.x) * (1. - smoothstep(.55,.85,p.x));
+    base = mix(base, vec3(.46,.16,.09), cany);
+    float cr = vnoise(p * 11.);
+    base = mix(base, vec3(.72,.26,.14), smoothstep(.8,.81,cr));
+    base = mix(base, vec3(.949,.902,.816), smoothstep(.93,.94, p.y + .05 * vnoise(p * 8.)));
+  #else
+    float h = fbm(p * 2.4 + 7.);
+    base = vec3(.914,.875,.788);
+    base = mix(base, vec3(.78,.73,.63), 1. - smoothstep(.43,.44,h));
+    base = mix(base, vec3(.7,.65,.56), smoothstep(.78,.79, vnoise(p * 14.)));
+  #endif
+  vec3 n = normalize(vN);
+  float d = dot(n, normalize(uLight));
+  float w = fwidth(d) * 1.2 + .001;
+  float s1 = smoothstep(-.05 - w, -.05 + w, d);
+  float s2 = smoothstep(.45 - w, .45 + w, d);
+  vec3 col = mix(mix(base * vec3(.3,.32,.5), base * .84, s1), base * 1.05, s2);
+  col = mix(col, col * .84, halftone(gl_FragCoord.xy, 5., .38) * (1. - s2) * s1);
+  float fr = 1. - max(dot(n, normalize(cameraPosition - vWP)), 0.);
+  col = mix(col, uRim, smoothstep(uRimAmt - .015, uRimAmt + .015, fr) * s1);
+  gl_FragColor = vec4(col, 1.);
+}`;
+const OVS = `
+uniform float uThick; uniform vec2 uRes; uniform float uPR;
+attribute vec3 onormal;
+void main(){
+  vec4 p = vec4(position, 1.);
+  vec3 n = onormal;
+  #ifdef USE_INSTANCING
+    p = instanceMatrix * p; n = mat3(instanceMatrix) * n;
+  #endif
+  vec4 clip = projectionMatrix * modelViewMatrix * p;
+  vec2 dir = (mat3(modelViewMatrix) * n).xy;
+  float l = length(dir);
+  dir = l > 1e-4 ? dir / l : vec2(0.);
+  clip.xy += dir * uThick * uPR * 2. * clip.w / uRes;
+  gl_Position = clip;
+}`;
+const OFS = `uniform vec3 uColor; void main(){ gl_FragColor = vec4(uColor, 1.); }`;
+const STAR_VS = `
+attribute float aSize; attribute float aSeed; attribute vec3 aColor;
+uniform float uPR; uniform float uTime;
+varying vec3 vColor; varying float vSize;
+void main(){
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
+  float tw = .72 + .28 * sin(uTime * (1. + aSeed * 2.) + aSeed * 40.);
+  gl_PointSize = aSize * uPR * tw;
+  vColor = aColor; vSize = aSize;
+}`;
+const STAR_FS = `
+uniform float uOpacity; varying vec3 vColor; varying float vSize;
+void main(){
+  vec2 p = gl_PointCoord * 2. - 1.;
+  float a;
+  if (vSize > 7.) {
+    float arms = 1. - smoothstep(0., .03, abs(p.x) * abs(p.y));
+    arms *= 1. - smoothstep(.6, 1., length(p));
+    a = max(arms, 1. - smoothstep(.16, .24, length(p)));
+  } else a = 1. - smoothstep(.5, 1., length(p));
+  if (a < .02) discard;
+  gl_FragColor = vec4(vColor, a * uOpacity);
+}`;
+
+function initScene() {
+  if (!window.THREE) return null;
+  const T = THREE;
+  const canvas = $('#scene');
+  let renderer;
+  try { renderer = new T.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' }); }
+  catch (e) { return null; }
+  let MOBILE = innerWidth <= 900;
+  const pr = () => Math.min(window.devicePixelRatio || 1, MOBILE ? 1.5 : 2);
+  renderer.setPixelRatio(pr());
+  renderer.setSize(innerWidth, innerHeight, false);
+  renderer.setClearColor(0x000000, 0);
+
+  const scene = new T.Scene();
+  const camera = new T.PerspectiveCamera(35, innerWidth / innerHeight, .5, 4000);
+  const U = {
+    uLight: { value: new T.Vector3(-.55, .55, .62).normalize() },
+    uPR: { value: pr() },
+    uRes: { value: new T.Vector2(innerWidth * pr(), innerHeight * pr()) },
+    uTime: { value: 0 }
+  };
+  const L_HERO = new T.Vector3(-.55, .55, .62).normalize(), L_SPACE = new T.Vector3(-.85, .3, .42).normalize();
+
+  /* ---- material + mesh helpers ---- */
+  const outlineCache = {};
+  const outlineMat = px => outlineCache[px] || (outlineCache[px] = new T.ShaderMaterial({
+    uniforms: { uThick: { value: px }, uRes: U.uRes, uPR: U.uPR, uColor: { value: new T.Color('#1B1A2E') } },
+    vertexShader: OVS, fragmentShader: OFS, side: T.BackSide
+  }));
+  const poster = (lit, mid, shade, o = {}) => new T.ShaderMaterial({
+    uniforms: {
+      uLit: { value: new T.Color(lit) }, uMid: { value: new T.Color(mid) }, uShade: { value: new T.Color(shade) },
+      uLight: U.uLight, uPR: U.uPR, uHalftone: { value: o.halftone ?? 1 },
+      uRim: { value: new T.Color(o.rim || '#000000') }, uRimAmt: { value: o.rimAmt || 0 }, uMap: { value: o.map || null }
+    },
+    vertexShader: VS, fragmentShader: FS_POSTER, defines: o.map ? { POSTER_MAP: '' } : {},
+    extensions: { derivatives: true }, side: o.side || T.FrontSide
+  });
+  const planetMat = (kind, rim, rimAmt) => new T.ShaderMaterial({
+    uniforms: { uLight: U.uLight, uPR: U.uPR, uTime: U.uTime, uRim: { value: new T.Color(rim) }, uRimAmt: { value: rimAmt } },
+    vertexShader: VS, fragmentShader: FS_PLANET, defines: { PLANET: kind }, extensions: { derivatives: true }
+  });
+  function addOutlineNormals(geo) {
+    if (geo.attributes.onormal) return geo;
+    const pos = geo.attributes.position, nor = geo.attributes.normal, map = new Map(), keys = [];
+    for (let i = 0; i < pos.count; i++) {
+      const k = pos.getX(i).toFixed(3) + ',' + pos.getY(i).toFixed(3) + ',' + pos.getZ(i).toFixed(3);
+      keys.push(k);
+      let a = map.get(k); if (!a) { a = [0, 0, 0]; map.set(k, a); }
+      a[0] += nor.getX(i); a[1] += nor.getY(i); a[2] += nor.getZ(i);
+    }
+    const out = new Float32Array(pos.count * 3);
+    for (let i = 0; i < pos.count; i++) {
+      const a = map.get(keys[i]), l = Math.hypot(a[0], a[1], a[2]) || 1;
+      out[i * 3] = a[0] / l; out[i * 3 + 1] = a[1] / l; out[i * 3 + 2] = a[2] / l;
+    }
+    geo.setAttribute('onormal', new T.BufferAttribute(out, 3));
+    return geo;
+  }
+  function mk(geo, mat, parent, outline = 2.2) {
+    const g = new T.Group();
+    g.add(new T.Mesh(geo, mat));
+    if (outline) { addOutlineNormals(geo); g.add(new T.Mesh(geo, outlineMat(outline))); }
+    if (parent) parent.add(g);
+    return g;
+  }
+  function instanced(geo, mat, count, parent, outline) {
+    const m = new T.InstancedMesh(geo, mat, count);
+    m.frustumCulled = false; parent.add(m);
+    if (outline) {
+      addOutlineNormals(geo);
+      const o = new T.InstancedMesh(geo, outlineMat(outline), count);
+      o.instanceMatrix = m.instanceMatrix; o.frustumCulled = false; parent.add(o);
+    }
+    return m;
+  }
+  function mergeGeos(list) {
+    const pos = [], nor = [];
+    list.forEach(([g, m]) => {
+      const gi = g.index ? g.toNonIndexed() : g.clone();
+      gi.applyMatrix4(m);
+      const pa = gi.attributes.position.array, na = gi.attributes.normal.array;
+      for (let i = 0; i < pa.length; i++) { pos.push(pa[i]); nor.push(na[i]); }
+    });
+    const out = new T.BufferGeometry();
+    out.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+    out.setAttribute('normal', new T.Float32BufferAttribute(nor, 3));
+    return out;
+  }
+  const flat = c => new T.MeshBasicMaterial({ color: c });
+  const M4 = (x, y, z, rx = 0, ry = 0, rz = 0) => new T.Matrix4().compose(new T.Vector3(x, y, z), new T.Quaternion().setFromEuler(new T.Euler(rx, ry, rz)), new T.Vector3(1, 1, 1));
+
+  const MAT = {
+    cream: poster('#FFF7E8', '#F2E6D0', '#B9A98F'),
+    teal: poster('#3A8A89', '#1F5E63', '#123A3E'),
+    terra: poster('#EC7D57', '#D2502D', '#8E3520'),
+    metal: poster('#5D5A76', '#3A3754', '#1B1A2E', { halftone: 0 }),
+    glass: poster('#7CC0B8', '#2E7A7C', '#123A3E', { halftone: 0 }),
+    pad: poster('#F6EAD4', '#DCCBAE', '#A48D72'),
+    cloud: poster('#FFFBF2', '#F2E6D0', '#B7CFC6'),
+    smoke: poster('#FFFBF2', '#F2E6D0', '#C9B79C'),
+    rock: poster('#C9B8A0', '#A38B74', '#5E4E47')
+  };
+
+  /* ================= ROCKET ================= */
+  const B0 = .55, B1 = 3.15, TIP = 11.8, MID = 5.9;
+  const rig = new T.Group(); scene.add(rig);
+  const rocket = new T.Group(); rig.add(rocket);
+  const ship = new T.Group(); rocket.add(ship);
+  const shipR = y => {
+    if (y < B1 + .35) return lerp(.9, 1.04, (y - B1) / .35);
+    if (y < 8.2) return 1.04 + .05 * Math.sin((y - B1 - .35) / (8.2 - B1 - .35) * Math.PI);
+    const v = (y - 8.2) / (TIP - 8.2);
+    return 1.04 * Math.pow(Math.max(0, Math.cos(v * Math.PI / 2)), .78);
+  };
+  const hullPts = [];
+  for (let i = 0; i <= 64; i++) { const y = lerp(B1, TIP, i / 64); hullPts.push(new T.Vector2(Math.max(.002, shipR(y)), y)); }
+  const hullCanvas = document.createElement('canvas');
+  hullCanvas.width = 1024; hullCanvas.height = 1024;
+  const hullTex = new T.CanvasTexture(hullCanvas);
+  hullTex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  function paintHull(l) {
+    const c = hullCanvas.getContext('2d'), W = 1024, H = 1024;
+    const row = y => (1 - (y - B1) / (TIP - B1)) * H;
+    c.fillStyle = '#F2E6D0'; c.fillRect(0, 0, W, H);
+    c.fillStyle = '#D2502D'; c.fillRect(0, 0, W, row(8.65));
+    c.fillStyle = '#1B1A2E'; c.fillRect(0, row(8.65) - 3, W, 6);
+    c.fillStyle = 'rgba(27,26,46,.4)';
+    for (let x = 6; x < W; x += 22) { c.beginPath(); c.arc(x, row(8.65) + 16, 3.2, 0, 7); c.fill(); }
+    c.fillStyle = '#1F5E63'; c.fillRect(0, row(4.6), W, row(3.72) - row(4.6));
+    c.fillStyle = '#1B1A2E'; c.fillRect(0, row(4.6) - 3, W, 5); c.fillRect(0, row(3.72) - 2, W, 5);
+    c.fillStyle = '#D2502D'; c.fillRect(0, row(4.98) - 5, W, 10);
+    c.save();
+    c.translate(W / 2, (row(4.6) + row(3.72)) / 2 + 2);
+    c.scale(1, .76);
+    c.fillStyle = '#F2E6D0';
+    c.font = '800 70px Unbounded, "Arial Black", sans-serif';
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+    if ('letterSpacing' in c) c.letterSpacing = '10px';
+    c.fillText(l === 'en' ? 'AELITA' : 'АЭЛИТА', 0, 0);
+    c.restore();
+    c.save();
+    c.translate(W / 2 + 250, row(6.6));
+    c.rotate(-Math.PI / 2); c.scale(1.3, 1);
+    c.fillStyle = '#1B1A2E'; c.font = '600 40px "IBM Plex Mono", monospace'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText('AE-042', 0, 0);
+    c.restore();
+    hullTex.needsUpdate = true;
+  }
+  paintHull(lang);
+  mk(new T.LatheGeometry(hullPts, 64, Math.PI, Math.PI * 2), poster('#FFFFFF', '#E6DED2', '#9C9EB6', { map: hullTex }), ship);
+
+  function porthole(y, r) {
+    const g = new T.Group();
+    mk(new T.TorusGeometry(r, r * .24, 12, 40), MAT.metal, g, 1.4);
+    mk(new T.CircleGeometry(r * 1.02, 36), MAT.glass, g, 0);
+    const glint = new T.Mesh(new T.CircleGeometry(r * .26, 18), flat('#F6C66B'));
+    glint.position.set(-r * .34, r * .34, .02); g.add(glint);
+    g.position.set(0, y, shipR(y) - .02);
+    ship.add(g);
+  }
+  porthole(7.35, .36); porthole(6.25, .25);
+
+  const needle = mk(new T.CylinderGeometry(.03, .06, 1.1, 8), MAT.metal, ship, 1.2); needle.position.y = TIP + .45;
+  const beaconBall = mk(new T.SphereGeometry(.12, 12, 10), poster('#F6C66B', '#E9A23B', '#A86E1D', { halftone: 0 }), ship, 1.2); beaconBall.position.y = TIP + 1.02;
+
+  const finShape = new T.Shape();
+  finShape.moveTo(0, 5.9); finShape.quadraticCurveTo(.6, 4.0, 1.55, 2.0);
+  finShape.lineTo(1.46, 1.5); finShape.quadraticCurveTo(.8, 2.3, 0, 3.35); finShape.lineTo(0, 5.9);
+  const finGeo = new T.ExtrudeGeometry(finShape, { depth: .16, bevelEnabled: true, bevelThickness: .04, bevelSize: .04, bevelSegments: 2, curveSegments: 18 });
+  finGeo.translate(0, 0, -.08);
+  [-30, -150, 90].forEach(deg => {
+    const pivot = new T.Group(); pivot.rotation.y = deg * Math.PI / 180;
+    const f = mk(finGeo, MAT.terra, pivot); f.position.x = .8; ship.add(pivot);
+  });
+  const lathe = (pts, seg = 24) => new T.LatheGeometry(pts.map(p => new T.Vector2(p[0], p[1])), seg);
+  const shipBell = mk(lathe([[.66, -.6], [.52, -.35], [.4, -.12], [.36, 0]], 28), MAT.metal, ship, 1.6);
+  shipBell.position.y = B1;
+
+  const booster = new T.Group(); rocket.add(booster);
+  const bb = mk(new T.CylinderGeometry(1.0, 1.02, B1 - B0, 48, 1), MAT.teal, booster); bb.position.y = (B0 + B1) / 2;
+  const bring = mk(new T.CylinderGeometry(1.035, 1.035, .3, 48, 1), MAT.cream, booster, 1.6); bring.position.y = B1 - .2;
+  const bring2 = mk(new T.CylinderGeometry(1.045, 1.045, .14, 48, 1), MAT.cream, booster, 1.2); bring2.position.y = B0 + .5;
+  const bellGeo = lathe([[.44, -.55], [.33, -.33], [.24, -.1], [.22, 0]], 20);
+  [[.46, .46], [-.46, .46], [.46, -.46], [-.46, -.46]].forEach(([x, z]) => { const b = mk(bellGeo, MAT.metal, booster, 1.4); b.position.set(x, B0, z); });
+
+  /* flat billboard flame, drawn like a poster cut-out */
+  function flameShape(len, rad) {
+    const s = new T.Shape(), pts = [];
+    for (let i = 0; i <= 24; i++) {
+      const u = i / 24;
+      const r = u < .2 ? rad * Math.sin(u / .2 * Math.PI / 2) : rad * Math.pow(1 - (u - .2) / .8, .9);
+      pts.push([r, -u * len]);
+    }
+    s.moveTo(0, 0);
+    pts.forEach(p => s.lineTo(p[0], p[1]));
+    for (let i = pts.length - 1; i >= 0; i--) s.lineTo(-pts[i][0], pts[i][1]);
+    return new T.ShapeGeometry(s, 4);
+  }
+  function makeFlame(scale) {
+    const g = new T.Group(), layers = [];
+    [[1.12, 5.6, '#1B1A2E', 0], [1.0, 5.2, '#D2502D', .02], [.72, 3.9, '#E9A23B', .04], [.4, 2.4, '#FFF1D2', .06]].forEach(([r, len, c, z], i) => {
+      const m = new T.Mesh(flameShape(len * scale, r * scale), flat(c));
+      if (i === 0) m.position.y = .12 * scale;
+      m.position.z = z; g.add(m); layers.push(m);
+    });
+    g.userData.layers = layers;
+    return g;
+  }
+  const flameB = makeFlame(1); booster.add(flameB); flameB.position.y = .05;
+  const flameS = makeFlame(.62); ship.add(flameS); flameS.position.y = B1 - .55;
+
+  /* ================= LAUNCH SITE (world) ================= */
+  const world = new T.Group(); scene.add(world);
+  const ground = new T.Mesh(new T.PlaneGeometry(1400, 1400), flat('#E3A878'));
+  ground.rotation.x = -Math.PI / 2; ground.position.y = -.05; world.add(ground);
+  const apron = new T.Mesh(new T.CircleGeometry(15, 64), flat('#EBCB9F'));
+  apron.rotation.x = -Math.PI / 2; apron.position.y = -.02; world.add(apron);
+  [[-0.35, 28, 2.2], [0.35, 28, 2.2]].forEach(([a, len, w]) => {
+    const road = new T.Mesh(new T.PlaneGeometry(w, len * 6), flat('#D99A6C'));
+    road.rotation.x = -Math.PI / 2; road.rotation.z = a; road.position.set(Math.sin(a) * len * 3.2, -.03, -Math.cos(a) * len * 3.2);
+    world.add(road);
+  });
+  const pad = mk(new T.CylinderGeometry(3.4, 3.9, 1.2, 56, 1), MAT.pad, world); pad.position.y = -.6;
+  const trench = new T.Mesh(new T.CircleGeometry(1.35, 36), flat('#1B1A2E'));
+  trench.rotation.x = -Math.PI / 2; trench.position.y = .012; world.add(trench);
+
+  // service tower: one merged lattice mesh
+  const TX = -3.15, TZ = -.9, TH = 13.2, TW = .55, parts = [];
+  const post = new T.BoxGeometry(.16, TH, .16);
+  [[TW, TW], [-TW, TW], [TW, -TW], [-TW, -TW]].forEach(([x, z]) => parts.push([post, M4(TX + x, TH / 2, TZ + z)]));
+  const beam = new T.BoxGeometry(TW * 2 + .16, .1, .1);
+  const diag = new T.BoxGeometry(.07, Math.hypot(TW * 2, 1.32), .07);
+  const ang = Math.atan2(TW * 2, 1.32);
+  for (let y = 1.32, k = 0; y <= TH + .01; y += 1.32, k++) {
+    parts.push([beam, M4(TX, y, TZ + TW)], [beam, M4(TX, y, TZ - TW)], [beam, M4(TX + TW, y, TZ, 0, Math.PI / 2, 0)], [beam, M4(TX - TW, y, TZ, 0, Math.PI / 2, 0)]);
+    const s = k % 2 ? 1 : -1, cy = y - .66;
+    parts.push([diag, M4(TX, cy, TZ + TW, 0, 0, s * ang)], [diag, M4(TX, cy, TZ - TW, 0, 0, -s * ang)], [diag, M4(TX + TW, cy, TZ, s * ang, 0, 0)], [diag, M4(TX - TW, cy, TZ, -s * ang, 0, 0)]);
+  }
+  parts.push([new T.BoxGeometry(1.7, .22, 1.7), M4(TX, TH + .1, TZ)]);
+  parts.push([new T.CylinderGeometry(.05, .08, 2.2, 6), M4(TX + .3, TH + 1.2, TZ)]);
+  mk(mergeGeos(parts), MAT.teal, world, 1.4);
+  const towerBeacon = mk(new T.SphereGeometry(.16, 12, 10), poster('#F6C66B', '#E9A23B', '#A86E1D', { halftone: 0 }), world, 1.2);
+  towerBeacon.position.set(TX + .3, TH + 2.35, TZ);
+  const armPivot = new T.Group(); armPivot.position.set(TX + TW, 9.3, TZ + .9); world.add(armPivot);
+  const arm = mk(new T.BoxGeometry(1.75, .3, .42), MAT.terra, armPivot, 1.6); arm.position.x = .87;
+  const arm2 = mk(new T.BoxGeometry(1.2, .22, .34), MAT.terra, world, 1.4); arm2.position.set(TX + TW + .6, 4.6, TZ + .75);
+
+  // fuel spheres
+  [[8.2, -6.5, 1.35], [11.4, -10.5, 1.2]].forEach(([x, z, r]) => {
+    const s = mk(new T.SphereGeometry(r, 28, 20), MAT.cream, world); s.position.set(x, r + 1.1, z);
+    const band = mk(new T.CylinderGeometry(r * 1.01, r * 1.01, .22, 28, 1, true), MAT.terra, world, 0); band.position.set(x, r + 1.1, z);
+    const legs = [];
+    for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + .6; legs.push([new T.CylinderGeometry(.07, .07, r + 1.1, 6), M4(x + Math.cos(a) * r * .7, (r + 1.1) / 2, z + Math.sin(a) * r * .7)]); }
+    mk(mergeGeos(legs), MAT.teal, world, 1.2);
+  });
+
+  // layered mesas, flat poster colours: near → far
+  function ridge(seed, w, hMin, hMax, dist) {
+    const r = rng(seed), s = new T.Shape();
+    let x = -w / 2;
+    s.moveTo(x, -10); s.lineTo(x, 1.2);
+    while (x < w / 2) {
+      x += 14 + r() * 70; s.lineTo(x, 1.2 + r() * 1.4);
+      // keep the left of the frame (behind the copy) low and quiet
+      const calm = MOBILE ? 1 : .12 + .88 * clamp((x + dist * .55) / (dist * .4));
+      const mw = 16 + r() * 60, mh = Math.max(2.4, (hMin + r() * (hMax - hMin)) * calm), sl = 2.5 + r() * 5;
+      s.lineTo(x + sl, mh);
+      if (r() < .45) { s.lineTo(x + sl + mw * .35, mh); s.lineTo(x + sl + mw * .35 + 2, mh * .68); s.lineTo(x + sl + mw, mh * .68); }
+      else s.lineTo(x + sl + mw, mh);
+      x += sl * 2 + mw; s.lineTo(x, 1.2);
+    }
+    s.lineTo(w / 2, -10); s.lineTo(-w / 2, -10);
+    return new T.ShapeGeometry(s, 2);
+  }
+  [[-330, '#F1CBA4', 22, 58, 11], [-260, '#E8A57A', 16, 42, 23], [-190, '#D9794B', 10, 28, 37], [-125, '#C4552F', 5, 16, 51]].forEach(([z, c, a, b, seed]) => {
+    const m = new T.Mesh(ridge(seed, 1100, a, b, -z + 30), flat(c)); m.position.set(0, 0, z); world.add(m);
+  });
+  const sun = new T.Group(); sun.position.set(34, 27, -440); world.add(sun);
+  [[58, 62, '#F5D5A6'], [47, 51, '#F2C07A']].forEach(([a, b, c]) => sun.add(new T.Mesh(new T.RingGeometry(a, b, 96), flat(c))));
+  sun.add(new T.Mesh(new T.CircleGeometry(42, 96), flat('#E9A23B')));
+
+  // ignition burst (comic-style star) at the pad
+  function burstGeo(n, r0, r1, seed) {
+    const r = rng(seed), s = new T.Shape();
+    for (let i = 0; i < n * 2; i++) {
+      const a = i / (n * 2) * Math.PI * 2, rad = i % 2 === 0 ? r1 * (.72 + r() * .5) : r0;
+      const x = Math.cos(a) * rad, y = Math.sin(a) * rad * .62;
+      if (i === 0) s.moveTo(x, y); else s.lineTo(x, y);
+    }
+    return new T.ShapeGeometry(s);
+  }
+  const burst = new T.Group(); burst.position.set(0, 1.1, .5); world.add(burst);
+  [[2.5, 7, '#1B1A2E', 0, 1.07], [2.3, 6.4, '#E9A23B', .03, 1], [1.2, 3.4, '#FFF1D2', .06, 1]].forEach(([r0, r1, c, z, sc]) => {
+    const m = new T.Mesh(burstGeo(15, r0, r1, 5), flat(c)); m.position.z = z; m.scale.setScalar(sc); burst.add(m);
+  });
+
+  // clouds (instanced spheres)
+  const cloudData = [], rc = rng(7);
+  for (let i = 0; i < 26; i++) {
+    const cy = 30 + (i / 26) * 170 + rc() * 12, side = i % 2 ? -1 : 1, cx = side * (7 + rc() * 42), cz = -40 + rc() * 50;
+    const n = 5 + (rc() * 3 | 0), size = 3 + rc() * 4.5;
+    for (let j = 0; j < n; j++) {
+      const f = j / (n - 1) - .5, fall = 1 - Math.abs(f) * .9;
+      cloudData.push([cx + f * size * 2.6 + (rc() - .5) * 1.4, cy + rc() * size * .45 * fall, cz + (rc() - .5) * size * .8, size * (.5 + rc() * .45) * fall]);
+    }
+  }
+  const cloudGeo = new T.IcosahedronGeometry(1, 3);
+  const clouds = instanced(cloudGeo, MAT.cloud, cloudData.length, world, 1.6);
+  const m4 = new T.Matrix4(), qI = new T.Quaternion(), pv = new T.Vector3(), sv = new T.Vector3();
+  cloudData.forEach((c, i) => { pv.set(c[0], c[1], c[2]); sv.set(c[3] * 1.25, c[3] * .78, c[3]); m4.compose(pv, qI, sv); clouds.setMatrixAt(i, m4); });
+  clouds.instanceMatrix.needsUpdate = true;
+
+  // smoke & exhaust trail (instanced, scroll-scrubbed)
+  const NP = MOBILE ? 64 : 120;
+  const puffGeo = new T.IcosahedronGeometry(1, 3);
+  const puffs = instanced(puffGeo, MAT.smoke, NP, world, 1.8);
+  const PD = [], rp = rng(42), nG = Math.round(NP * .45);
+  for (let i = 0; i < NP; i++) {
+    const g = i < nG, u = g ? i / nG : (i - nG) / (NP - nG);
+    PD.push({ g, tb: g ? .42 + u * .95 + rp() * .05 : 1.05 + u * 1.85 + rp() * .02, a: rp() * Math.PI * 2, s: .7 + rp() * .6, j: rp() - .5, k: rp() * 10 });
+  }
+  const altAt = t => t < 1.05 ? 0 : 300 * Math.pow(seg(t, 1.05, 3.0), 2.3) + Math.max(0, t - 3) * 90;
+  function updatePuffs(t, time) {
+    for (let i = 0; i < NP; i++) {
+      const p = PD[i], age = t - p.tb;
+      let s = 0;
+      if (age > 0) {
+        if (p.g) {
+          const sp = 2.6 + 19 * (1 - Math.exp(-age * 2.2)), side = Math.cos(p.a);
+          const reach = side < 0 && !MOBILE ? .32 : 1;
+          pv.set(Math.sign(side) * (1.6 + Math.abs(side) * sp * reach), .7 + age * 1.6 + p.s * .5, Math.sin(p.a) * sp * .28 - 2.2);
+          s = (.8 + 2.3 * (1 - Math.exp(-age * 3.2))) * p.s * (1 - seg(age, 1.5, 2.6));
+        } else {
+          const h = altAt(p.tb);
+          pv.set(p.j * 1.4 * (1 + age * 1.5), h - .6 - age * 2.4, p.j * 1.1);
+          s = (.8 + 2.8 * (1 - Math.exp(-age * 2.6))) * p.s * (1 + h * .004) * (1 - seg(age, .8, 1.5));
+        }
+        pv.x += Math.sin(time * .7 + p.k) * .15; pv.y += Math.cos(time * .6 + p.k) * .12;
+      }
+      sv.setScalar(Math.max(s, 1e-4)); m4.compose(pv, qI, sv); puffs.setMatrixAt(i, m4);
+    }
+    puffs.instanceMatrix.needsUpdate = true;
+  }
+  // stage-separation puffs live with the rocket
+  const sepPuffs = instanced(puffGeo, MAT.smoke, 10, rocket, 1.6);
+  function updateSep(t) {
+    const age = t - 3.45;
+    for (let i = 0; i < 10; i++) {
+      const a = i / 10 * Math.PI * 2, r = 1.1 + Math.max(0, age) * 7;
+      const s = age > 0 ? .75 * (1 - seg(age, .1, .5)) * (1 + (i % 3) * .2) : 0;
+      pv.set(Math.cos(a) * r, B1 - .1 - Math.max(0, age) * 2, Math.sin(a) * r);
+      sv.setScalar(Math.max(s, 1e-4)); m4.compose(pv, qI, sv); sepPuffs.setMatrixAt(i, m4);
+    }
+    sepPuffs.instanceMatrix.needsUpdate = true;
+  }
+
+  /* ================= SPACE ================= */
+  const NS = MOBILE ? 700 : 1500, rs = rng(99);
+  const sPos = new Float32Array(NS * 3), sSize = new Float32Array(NS), sSeed = new Float32Array(NS), sCol = new Float32Array(NS * 3);
+  const starCols = [new T.Color('#F2E6D0'), new T.Color('#F6C66B'), new T.Color('#9CC6BD')];
+  for (let i = 0; i < NS; i++) {
+    const u = rs() * 2 - 1, th = rs() * Math.PI * 2, rr = Math.sqrt(1 - u * u);
+    sPos[i * 3] = Math.cos(th) * rr * 700; sPos[i * 3 + 1] = u * 700; sPos[i * 3 + 2] = Math.sin(th) * rr * 700;
+    sSize[i] = rs() < .05 ? 9 + rs() * 8 : 1.4 + rs() * 2.6;
+    sSeed[i] = rs();
+    const c = starCols[rs() < .8 ? 0 : rs() < .6 ? 1 : 2];
+    sCol[i * 3] = c.r; sCol[i * 3 + 1] = c.g; sCol[i * 3 + 2] = c.b;
+  }
+  const starGeo = new T.BufferGeometry();
+  starGeo.setAttribute('position', new T.BufferAttribute(sPos, 3));
+  starGeo.setAttribute('aSize', new T.BufferAttribute(sSize, 1));
+  starGeo.setAttribute('aSeed', new T.BufferAttribute(sSeed, 1));
+  starGeo.setAttribute('aColor', new T.BufferAttribute(sCol, 3));
+  const starMat = new T.ShaderMaterial({ uniforms: { uPR: U.uPR, uTime: U.uTime, uOpacity: { value: 0 } }, vertexShader: STAR_VS, fragmentShader: STAR_FS, transparent: true, depthWrite: false });
+  const stars = new T.Points(starGeo, starMat); stars.frustumCulled = false; scene.add(stars);
+
+  const earth = mk(new T.SphereGeometry(70, 96, 64), planetMat(1, '#CDE7DE', .8), scene, 2.4);
+  earth.rotation.x = 1.15;
+  const moon = mk(new T.SphereGeometry(7, 48, 32), planetMat(3, '#FFFFFF', 2.), scene, 2);
+  const mars = mk(new T.SphereGeometry(34, 128, 96), planetMat(2, '#F4A07E', .8), scene, 2.6);
+  mars.rotation.z = .42;
+  const halo = new T.Group(); scene.add(halo);
+  [[36.6, 37.2, .3], [40.8, 41.3, .16], [45.5, 45.9, .08]].forEach(([a, b, o]) => halo.add(new T.Mesh(new T.RingGeometry(a, b, 128), new T.MeshBasicMaterial({ color: '#F2E6D0', transparent: true, opacity: o, depthWrite: false }))));
+  const phGeo = new T.IcosahedronGeometry(2.4, 3);
+  { const p = phGeo.attributes.position, v = new T.Vector3();
+    for (let i = 0; i < p.count; i++) {
+      v.fromBufferAttribute(p, i); const n = v.clone().normalize();
+      const d = 1 + .16 * Math.sin(n.x * 4.1 + 1.3) * Math.cos(n.y * 3.7) + .09 * Math.sin(n.z * 6.3 + n.x * 2.2);
+      v.copy(n).multiplyScalar(2.4 * d); p.setXYZ(i, v.x * 1.3, v.y * .92, v.z);
+    }
+    phGeo.computeVertexNormals(); }
+  const phobos = mk(phGeo, MAT.rock, scene, 1.8);
+
+  /* ================= DIRECTOR ================= */
+  const keyed = (keys, t, out) => {
+    if (t <= keys[0][0]) return out.set(keys[0][1], keys[0][2], keys[0][3]);
+    for (let i = 0; i < keys.length - 1; i++) {
+      const a = keys[i], b = keys[i + 1];
+      if (t <= b[0]) { const u = easeInOut(seg(t, a[0], b[0])); return out.set(lerp(a[1], b[1], u), lerp(a[2], b[2], u), lerp(a[3], b[3], u)); }
+    }
+    const z = keys[keys.length - 1]; return out.set(z[1], z[2], z[3]);
+  };
+  const CAM_POS = [[0, .6, 4.4, 30], [1.05, .6, 4.4, 30], [2.0, 0, 2, 36], [2.75, 0, 2, 38], [3.25, -12, 10, 32], [3.9, -12, 10, 32], [4.5, -3, 8.6, 34], [5.0, -3, 8.6, 34], [5.9, -6, 9.5, 46], [6.4, -4, 12, 52], [7, -4, 12, 52]];
+  const CAM_LOOK = [[0, 0, 6.4, 0], [1.05, 0, 6.4, 0], [2.0, 0, 5.5, 0], [2.75, 0, 5.5, 0], [3.25, 0, 3.5, 0], [3.9, 0, 3.5, 0], [4.5, 1.5, 5.9, 0], [5.0, 1.5, 5.9, 0], [5.9, 5, 4.6, 0], [6.4, 7, 2.5, 0], [7, 7, 2.5, 0]];
+  const EARTH_K = [[2.75, 40, -190, -40], [3.25, 38, -100, -34], [3.9, 40, -98, -36], [4.6, 70, -175, -170], [5.3, 60, -320, -420]];
+  const MARS_K = [[4.8, 200, -20, -220], [5.5, 70, -12, -100], [6.0, 56, -10, -64], [6.5, 48, -20, -46], [7, 48, -20, -46]];
+  const cPos = new T.Vector3(), cLook = new T.Vector3(), tmp = new T.Vector3();
+  const sm = { x: 0, y: 0 };
+  let hullLang = lang;
+
+  function billboardY(obj) {
+    obj.rotation.y = 0;
+    obj.updateMatrixWorld(true);
+    const lp = obj.worldToLocal(tmp.copy(camera.position));
+    obj.rotation.y = Math.atan2(lp.x, lp.z);
+  }
+  function flicker(fl, thrust, time, seed) {
+    fl.visible = thrust > .01;
+    if (!fl.visible) return;
+    fl.userData.layers.forEach((m, i) => {
+      const f = REDUCED ? 1 : 1 + .07 * Math.sin(time * (31 + i * 7) + seed + i) + .04 * Math.sin(time * 53 + i * 2);
+      m.scale.set(.75 + .25 * thrust, thrust * f, 1);
+    });
+  }
+
+  function render(t, dt, time, pointer) {
+    U.uTime.value = time;
+    U.uLight.value.copy(L_HERO).lerp(L_SPACE, seg(t, 2.8, 3.4)).normalize();
+    const alt = altAt(t);
+
+    /* rocket attitude */
+    const theta = -(Math.PI / 2 - .12) * easeInOut(seg(t, 3.95, 4.5));
+    rig.rotation.z = theta + (REDUCED ? 0 : Math.sin(time * .6) * .012 * seg(t, 4.5, 5));
+    rig.position.set(MID * Math.sin(theta), MID - MID * Math.cos(theta), 0);
+    rocket.rotation.y = .7 * easeInOut(seg(t, 1.3, 2.6));
+
+    /* booster separation */
+    const sep = seg(t, 3.45, 3.95);
+    booster.visible = t < 3.95;
+    booster.position.set(-sep * 2.2, -easeIn(sep) * 14, sep * 1.5);
+    booster.rotation.set(sep * .5, 0, sep * .8);
+    updateSep(t);
+    sepPuffs.visible = t > 3.4 && t < 4.1;
+
+    /* engines */
+    const thrustB = t < 3.45 ? .28 * seg(t, .35, .62) + .72 * easeOut(seg(t, .78, 1.05)) : 0;
+    const thrustS = .75 * seg(t, 3.58, 3.7) * (1 - seg(t, 5.3, 5.5));
+    rig.updateMatrixWorld(true);
+    billboardY(flameB); billboardY(flameS);
+    flicker(flameB, thrustB, time, 0);
+    flicker(flameS, thrustS, time, 3);
+
+    /* world */
+    world.visible = t < 2.8;
+    if (world.visible) {
+      world.position.y = -alt;
+      armPivot.rotation.y = -1.25 * easeInOut(seg(t, .25, .7));
+      const bi = seg(t, .72, .92) * (1 - seg(t, 1.12, 1.45));
+      burst.visible = bi > .01;
+      burst.scale.setScalar(Math.max(bi, 1e-3) * (REDUCED ? 1 : 1 + .06 * Math.sin(time * 30)));
+      burst.quaternion.copy(camera.quaternion);
+      updatePuffs(t, time);
+      const mf = time * 2;
+      towerBeacon.children[0].visible = Math.sin(mf) > 0 || REDUCED;
+    }
+
+    /* space bodies */
+    starMat.uniforms.uOpacity.value = seg(t, 2.8, 3.35);
+    stars.visible = t > 2.7;
+    earth.visible = t > 2.7 && t < 5.25;
+    if (earth.visible) { keyed(EARTH_K, t, earth.position); earth.rotation.y += dt * .03; }
+    moon.visible = t > 4.1 && t < 5.3;
+    if (moon.visible) { const u = seg(t, 4.12, 5.28); moon.position.set(lerp(95, -95, u), lerp(12, 20, u) + 5.9, lerp(-78, -120, u)); moon.rotation.y += dt * .05; }
+    mars.visible = halo.visible = t > 4.75;
+    if (mars.visible) { keyed(MARS_K, t, mars.position); mars.rotation.y += dt * .018; halo.position.copy(mars.position); halo.quaternion.copy(camera.quaternion); }
+    phobos.visible = t > 5.3 && t < 6.25;
+    if (phobos.visible) { const u = seg(t, 5.3, 6.25); phobos.position.set(lerp(80, 8, u), lerp(12, 22, u), lerp(-24, -30, u)); phobos.rotation.set(time * .21, time * .33, .4); }
+
+    /* camera */
+    keyed(CAM_POS, t, cPos); keyed(CAM_LOOK, t, cLook);
+    if (t < 2.0) {
+      cPos.y = lerp(4.4 - alt, 2, easeInOut(seg(t, 1.25, 2.0)));
+      cLook.y = lerp(6.4 - alt, 5.5, easeInOut(seg(t, 1.05, 1.6)));
+    }
+    if (MOBILE) cPos.sub(cLook).multiplyScalar(1.55).add(cLook);
+    const k = 1 - Math.exp(-dt * 3);
+    sm.x += (pointer.x - sm.x) * k; sm.y += (pointer.y - sm.y) * k;
+    cPos.x += sm.x * 1.3; cPos.y -= sm.y * .8;
+    if (!REDUCED) {
+      const shake = .14 * seg(t, .6, 1.05) * (1 - seg(t, 1.7, 2.4));
+      cPos.x += Math.sin(time * 37) * shake; cPos.y += Math.cos(time * 29) * shake;
+    }
+    camera.position.copy(cPos);
+    camera.lookAt(cLook);
+    stars.position.copy(camera.position);
+    const W = innerWidth, H = innerHeight;
+    const shiftX = MOBILE ? 0 : lerp(.17, .1, seg(t, 5.7, 6.4));
+    const shiftY = MOBILE ? lerp(.17, .12, seg(t, 2.8, 3.6)) : 0;
+    camera.setViewOffset(W, H, -shiftX * W, shiftY * H, W, H);
+
+    if (hullLang !== lang) { hullLang = lang; paintHull(lang); }
+    renderer.render(scene, camera);
+  }
+
+  function resize() {
+    MOBILE = innerWidth <= 900;
+    renderer.setPixelRatio(pr());
+    renderer.setSize(innerWidth, innerHeight, false);
+    U.uPR.value = pr();
+    U.uRes.value.set(innerWidth * pr(), innerHeight * pr());
+    camera.aspect = innerWidth / innerHeight;
+    camera.fov = MOBILE ? 40 : 35;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  if (document.fonts) document.fonts.ready.then(() => paintHull(lang));
+  renderer.compile(scene, camera);
+  return { render, resize };
+}
+
+boot();
+})();
+</script>
